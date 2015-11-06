@@ -36,7 +36,24 @@ arguments = docopt(__doc__)
 import sys,os
 from cb2logger import *
 
-from netCDF4 import Dataset
+def check_dependencies():
+    """function that checks we have the requireded dependencies, namely:
+    * matplotlib
+    * netCDF4
+    * ffmpeg
+    :returns: @todo
+    """
+
+    #This is the error message if ffmpeg is not installed...
+    #The program 'ffmpeg' is currently not installed.  You can install it by typing:
+        #sudo apt-get install libav-tools
+
+    #See:
+    #http://stackoverflow.com/questions/14050281/how-to-check-if-a-python-module-exists-without-importing-it
+
+
+
+
 
 if __name__ == "__main__": 
     LogStart('',fout=False)
@@ -46,6 +63,12 @@ if __name__ == "__main__":
     if not os.path.exists(file):
         lg.error("Input file: " + str(file) + " does not exist.")
         sys.exit("Input file: " + str(file) + " does not exist.")
+
+    check_dependencies()
+
+    from netCDF4 import Dataset
+    import matplotlib.pyplot as plt
+
 
     ifile=Dataset(file, 'r')
     #varone=ifile.variables['']
