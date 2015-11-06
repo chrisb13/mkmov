@@ -18,7 +18,7 @@
 
 
 """
-This ia python script for making movies
+This is a python script for making movies
 
 Example: python main.py /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc tos
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         sys.exit("Variable: " + str(variable) + " does not exist in netcdf4 file.")
     #import ipdb; ipdb.set_trace()
 
-    varone=ifile.variables[variable]
+    varone=ifile.variables[variable][:]
 
     #create_plot(varone)
 
