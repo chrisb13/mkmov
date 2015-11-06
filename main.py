@@ -51,3 +51,7 @@ if __name__ == "__main__":
     #varone=ifile.variables['']
     #put useful code here!
 
+    lg.info('')
+    localtime = time.asctime( time.localtime(time.time()) )
+    lg.info("Local current time : "+ str(localtime))
+    lg.info('SCRIPT ended')
