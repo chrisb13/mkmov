@@ -1,3 +1,5 @@
+![alt tag](https://raw.github.com/chrisb13/mkmov/master/img/mkmovlogo001.png)
+
 # mkmov
 python movie maker for NetCDF files
 
