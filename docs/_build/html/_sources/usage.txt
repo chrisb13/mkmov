@@ -3,6 +3,15 @@
 Usage
 ############
 
-Usage is super simple.
+Welcome to MkMov. This utility is designed to make a movie from a NetCDF file.
 
-python mkmov.py netcdf_filename.nc variable_name
+We have tried to make this program as easy to install and use as possible.
+
+Basic usage is as follows: 
+::
+    #First activate python environment that has matplotlib and netCDF4 packages..
+    git clone ...
+    cd mkmov
+    python main.py FILE_PATH VARIABLE_NAME
+That's it! A .mov file will appear in your mkmov folder with your movie.
+

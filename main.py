@@ -18,7 +18,8 @@
 
 
 """
-This is a python script for making movies
+MkMov v0.1
+This is a python script for making movies from a netCDF file.
 
 Example: python main.py /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc tos
 
@@ -33,6 +34,42 @@ Arguments:
 Options:
     -h,--help          : show this help message
 """
+
+#possible new format for arg passer...
+# """
+# MkMov v0.1
+# Usage: sphinx-quickstart [options] [projectdir]
+
+# Options:
+  # --version             show program's version number and exit
+  # -h, --help            show this help message and exit
+
+  # Program options:
+    # --sep                       if specified, separate source and build dirs
+    # --wpath=DOT            if specified, path to place plots in before stiching, will not be removed
+
+  # Matplotlib options:
+    # -p PROJECT, --project=PROJECT
+                        # project name
+    # -a AUTHOR, --author=AUTHOR
+                        # author names
+    # -v VERSION          version of project
+    # -r RELEASE, --release=RELEASE
+                        # release of project
+    # -l LANGUAGE, --language=LANGUAGE
+                        # document language
+    # --suffix=SUFFIX     source file suffix
+    # --master=MASTER     master document name
+    # --epub              use epub
+
+  # Basemap options:
+    # --ext-autodoc       enable autodoc extension
+    # --ext-doctest       enable doctest extension
+    # --ext-intersphinx   enable intersphinx extension
+    # --ext-todo          enable todo extension
+# """
+
+
 from docopt import docopt
 arguments = docopt(__doc__)
 import sys,os
@@ -66,6 +103,27 @@ def check_dependencies():
         sys.exit("You don't have the matplotlib library!")
 
 
+def dispay_passed_args():
+    """function to print out the passed arguments to the logger
+    :returns: @todo
+    """
+    lg.info("-----------------------------------------------------------------")
+    lg.info("MkMov has been run with the following options...")
+
+    lg.info("File we are making a movie of: "+ os.path.basename(arguments['FILE_NAME']))
+
+    lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
+
+    lg.info("")
+    lg.info("Optional settings:")
+    #for optional parameters...
+    # if 'FILE_PATH' in arguments.keys():
+    # if 'VARIABLE_NAME' in arguments.keys():
+
+    lg.info("-----------------------------------------------------------------")
+    return
+
+
 def create_plot(name_of_array):
     """function to create plots.
     
@@ -88,6 +146,8 @@ def create_plot(name_of_array):
 if __name__ == "__main__": 
     LogStart('',fout=False)
     #lg.info("demo log message")
+
+    dispay_passed_args()
 
     check_dependencies()
 

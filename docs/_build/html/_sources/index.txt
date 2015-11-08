@@ -6,6 +6,10 @@
 Welcome to MkMov's documentation!
 =================================
 
+Welcome to MkMov. This utility is designed to make a movie from a NetCDF file.
+
+Already have matplotlib, netCDF4 and ffmpeg? Jump straight to usage. Otherwise have a look at our install section.
+
 Contents:
 
 .. toctree::

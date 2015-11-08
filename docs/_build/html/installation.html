@@ -55,10 +55,32 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>We have tried to keep dependencies to a minimum, they are:
-* ffmpeg
-* matplotlib
-* netCDF4</p>
+<p>We have tried to keep dependencies to a minimum. Most users working with climate data and python will already have the following installed.</p>
+<p>MkMov requires:</p>
+<ul class="simple">
+<li>matplotlib</li>
+<li>netCDF4</li>
+<li>ffmpeg</li>
+</ul>
+<p><em>If you already have these installed, skip to the usage section.</em></p>
+<p>If you&#8217;re not sure if you have the right packages or not, skip to usage and try and run mkmov and it will tell you if you do not have the correct python packages and ffmpeg.</p>
+<div class="section" id="matplotlib-and-netcdf4">
+<h2>Matplotlib and netCDF4<a class="headerlink" href="#matplotlib-and-netcdf4" title="Permalink to this headline">¶</a></h2>
+<p>There are a number of ways to install the python packages matplotlib and netCDF4 we recommend Anaconda.</p>
+<p>Steps:</p>
+<ol class="arabic simple">
+<li>Go to <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> and get the lastest version of Anaconda</li>
+<li>Install Anaconda with bash FILE_NAME, where FILE_NAME is the file you just downloaded</li>
+<li>Add netCDF4 library with <code class="docutils literal"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">netcdf4</span></code></li>
+</ol>
+</div>
+<div class="section" id="ffmpeg">
+<h2>FFMPEG<a class="headerlink" href="#ffmpeg" title="Permalink to this headline">¶</a></h2>
+<p>To install ffmpeg, assuming you are on a <a href="#id1"><span class="problematic" id="id2">*</span></a>nix system, then:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install ffmpeg
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -67,6 +89,15 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#matplotlib-and-netcdf4">Matplotlib and netCDF4</a></li>
+<li><a class="reference internal" href="#ffmpeg">FFMPEG</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to MkMov&#8217;s documentation!</a></p>
