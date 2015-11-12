@@ -18,60 +18,31 @@
 
 
 """
-MkMov v0.2
+MkMov v0.3
 This is a python script for making movies from a netCDF file. Interface is by command line.
 
 Examples: 
 python main.py --help
-python /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc tos main.py 
-python /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc tos main.py 
+python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
+python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+python main.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
 
 Usage:
     main.py -h
-    main.py VARIABLE_NAME FILE_NAME...
+    main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
     FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
 
 Options:
-    -h,--help          : show this help message
+    -h,--help                   : show this help message
+    --min MINIMUM               : the minimum value for the contour map 
+                                    (nb: if you select a min, you must select a max.)
+    --max MAXIMUM               : the maximum value for the contour map
+                                    (nb: if you select a max, you must select a min.)
+    --preview                   : show a preview of the plot (will exit afterwards)
 """
-
-#possible new format for arg passer...
-# """
-# MkMov v0.1
-# Usage: sphinx-quickstart [options] [projectdir]
-
-# Options:
-  # --version             show program's version number and exit
-  # -h, --help            show this help message and exit
-
-  # Program options:
-    # --sep                       if specified, separate source and build dirs
-    # --wpath=DOT            if specified, path to place plots in before stiching, will not be removed
-
-  # Matplotlib options:
-    # -p PROJECT, --project=PROJECT
-                        # project name
-    # -a AUTHOR, --author=AUTHOR
-                        # author names
-    # -v VERSION          version of project
-    # -r RELEASE, --release=RELEASE
-                        # release of project
-    # -l LANGUAGE, --language=LANGUAGE
-                        # document language
-    # --suffix=SUFFIX     source file suffix
-    # --master=MASTER     master document name
-    # --epub              use epub
-
-  # Basemap options:
-    # --ext-autodoc       enable autodoc extension
-    # --ext-doctest       enable doctest extension
-    # --ext-intersphinx   enable intersphinx extension
-    # --ext-todo          enable todo extension
-# """
-
 
 from docopt import docopt
 arguments = docopt(__doc__)
@@ -124,8 +95,12 @@ def dispay_passed_args(workingfolder):
     lg.info("-----------------------------------------------------------------")
     lg.info("MkMov has been run with the following options...")
 
-    for f in arguments['FILE_NAME']:
-        lg.info("File we are making a movie of file(s): "+ os.path.basename(f))
+    if len(arguments['FILE_NAME'])==1:
+        lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
+    elif len(arguments['FILE_NAME'])>1:
+        lg.info("We are making a movie of file(s): ")
+        for cnt,f in enumerate(arguments['FILE_NAME']):
+            lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
 
     lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
 
@@ -133,10 +108,13 @@ def dispay_passed_args(workingfolder):
 
     lg.info("")
     lg.info("Optional settings:")
-    #for optional parameters...
-    # if 'FILE_PATH' in arguments.keys():
-    # if 'VARIABLE_NAME' in arguments.keys():
 
+    #for optional parameters...
+    if (arguments['--min'] is not None) and (arguments['--max'] is not None):
+        lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
+
+    if arguments['--preview']:
+        lg.info("You have opted to preview your plot before making a movie.")
     lg.info("-----------------------------------------------------------------")
     return
 
@@ -171,6 +149,10 @@ class MovMaker(object):
         self.workingfolder=workingfolder
 
     def lights(self):
+        """function to do some sanity checks on the files and find out where the time dim is.
+        
+        """
+        lg.info("Lights! Looking at your netCDF files...")
         var_timedims=[]
 
         #error checks files, are all similar
@@ -208,12 +190,33 @@ class MovMaker(object):
             sys.exit("(Unlimited) 'time' dimension was not the same across all files, fatal error.")
         return
         
-    def camera(self):
+    def camera(self,minvar=None,maxvar=None,plotpreview=False):
         """function to create plots.
         
         :workingfolder: @todo
         :returns: @todo
         """
+        lg.info("Camera! Creating your plots...")
+        #get max and min values for timeseries. This is expensive :(
+        if (minvar is None) and (maxvar is None):
+            mins=[]
+            maxs=[]
+            for f in self.filelist:
+                ifile=Dataset(f, 'r')
+                name_of_array=ifile.variables[self.variable_name][:]
+
+                mins.append(np.min(name_of_array))
+                maxs.append(np.max(name_of_array))
+                ifile.close()
+
+            self.minvar=np.min(mins)
+            self.maxvar=np.max(maxs)
+
+        if minvar or maxvar is not None:
+            #user specified the range
+            self.minvar=float(minvar)
+            self.maxvar=float(maxvar)
+
         framecnt=1
         for f in self.filelist:
             ifile=Dataset(f, 'r')
@@ -222,8 +225,7 @@ class MovMaker(object):
             plt.close('all')
             fig=plt.figure()
 
-            #this is currently dodge...
-            x,y=np.meshgrid(np.arange(np.shape(name_of_array)[2]),np.arange(np.shape(name_of_array)[1]))
+            x,y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),np.arange(np.shape(name_of_array)[self.timedim+1]))
 
             minvar=np.min(name_of_array)
             maxvar=np.max(name_of_array)
@@ -240,25 +242,32 @@ class MovMaker(object):
                     name_of_array==0.,
                     name_of_array) 
 
-                cs1=plt.contourf(x,y,name_of_array[tstep,:,:],levels=np.linspace(minvar,maxvar,30))
+                cs1=plt.contourf(x,y,name_of_array[tstep,:,:],levels=np.linspace(self.minvar,self.maxvar,30))
 
                 #land mask...
                 cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
 
                 plt.colorbar(cs1)
                 #plt.show()
+
+                if plotpreview:
+                    plt.show()
+                    lg.info("Okay, we've shown you your plot, exiting...")
+                    sys.exit("Okay, we've shown you your plot, exiting...")
             
                 fig.savefig(self.workingfolder+'/moviepar'+str(framecnt).zfill(5)+'.png',dpi=300)
                 #fig.savefig('./.pdf',format='pdf')
                 fig.clf()
                 del ax
                 framecnt+=1
+            ifile.close()
 
     def action(self):
         """function to stitch the movies together!
         
         :returns: @todo
         """
+        lg.info("Action! Stitching your plots together with ffmpeg...")
 
         #ollie's command didn't work on storm
         #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
@@ -281,7 +290,7 @@ class MovMaker(object):
 
 if __name__ == "__main__": 
     LogStart('',fout=False)
-    #lg.info("demo log message")
+    #print arguments
     workingfol=tempfile.mkdtemp()+'/'
 
     dispay_passed_args(workingfol)
@@ -296,7 +305,7 @@ if __name__ == "__main__":
 
     #aah I've always wanted to say this!
     movmk.lights()
-    movmk.camera()
+    movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
     movmk.action()
 
     lg.info('')
