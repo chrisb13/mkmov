@@ -75,6 +75,9 @@ arguments = docopt(__doc__)
 import sys,os
 from cb2logger import *
 import imp
+import tempfile
+import subprocess
+import glob
 
 def check_dependencies():
     """function that checks we have the requireded dependencies, namely:
@@ -102,9 +105,17 @@ def check_dependencies():
         lg.error("You don't have the matplotlib library!")
         sys.exit("You don't have the matplotlib library!")
 
+    try:
+        imp.find_module('numpy')
+    except ImportError:
+        lg.error("You don't have the numpy library!")
+        sys.exit("You don't have the numpy library!")
 
-def dispay_passed_args():
+
+def dispay_passed_args(workingfolder):
     """function to print out the passed arguments to the logger
+
+    :workingfolder: @todo
     :returns: @todo
     """
     lg.info("-----------------------------------------------------------------")
@@ -113,6 +124,8 @@ def dispay_passed_args():
     lg.info("File we are making a movie of: "+ os.path.basename(arguments['FILE_NAME']))
 
     lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
+
+    lg.info("Our working directory is: "+ workingfolder)
 
     lg.info("")
     lg.info("Optional settings:")
@@ -124,35 +137,75 @@ def dispay_passed_args():
     return
 
 
-def create_plot(name_of_array):
+def create_plot(name_of_array,timedimen,workingfolder):
     """function to create plots.
     
     :name_of_array: @todo
+    :timedimen: @todo
+    :workingfolder: @todo
     :returns: @todo
     """
 
     plt.close('all')
     fig=plt.figure()
-    ax=fig.add_subplot(1, 1,1)
-    #code to plot
-    ax.set_title('msg')
-    ax.set_xlabel('msg')
-    ax.set_ylabel('msg')
-    #fig.savefig('./.png',dpi=300)
-    #fig.savefig('./.pdf',format='pdf')
-    plt.show()
+
+    #this is dodge...
+    x,y=np.meshgrid(np.arange(np.shape(name_of_array)[2]),np.arange(np.shape(name_of_array)[1]))
+    minvar=np.min(name_of_array)
+    maxvar=np.max(name_of_array)
+    for tstep in np.arange(np.shape(name_of_array)[timedimen]):
+        lg.debug("Working timestep: " + str(tstep))
+
+        ax=fig.add_subplot(111)
+
+        ax.set_title(arguments['VARIABLE_NAME'])
+        #ax.set_xlabel('msg')
+        #ax.set_ylabel('msg')
+
+        name_of_array= np.ma.masked_where(
+            name_of_array==0.,
+            name_of_array) 
+
+        cs1=plt.contourf(x,y,name_of_array[tstep,:,:],levels=np.linspace(minvar,maxvar,30))
+
+        #land mask...
+        cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+
+        plt.colorbar(cs1)
+        #plt.show()
+    
+        fig.savefig(workingfolder+'/moviepar'+str(tstep).zfill(5)+'.png',dpi=300)
+        #fig.savefig('./.pdf',format='pdf')
+        fig.clf()
+        del ax
+    print workingfolder
+
+    #ollie's command didn't work on storm
+    #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
+
+    os.chdir(workingfolder)
+    subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+os.path.basename(arguments['FILE_NAME']) + '.mov',shell=True)
+
+    #remove png
+    if os.path.isfile(workingfolder+os.path.basename(arguments['FILE_NAME']) + '.mov'):
+        ifiles=sorted(glob.glob(workingfolder + 'moviepar*.png' ))
+        assert(ifiles!=[]),"glob didn't find anything!"
+        for f in ifiles:
+            os.remove(f)
 
 
 if __name__ == "__main__": 
     LogStart('',fout=False)
     #lg.info("demo log message")
+    workingfol=tempfile.mkdtemp()+'/'
 
-    dispay_passed_args()
+    dispay_passed_args(workingfol)
 
     check_dependencies()
 
     from netCDF4 import Dataset
     import matplotlib.pyplot as plt
+    import numpy as np
 
     #file='/path/to/netcdf4/file.nc'
     file=arguments['FILE_NAME']
@@ -170,11 +223,23 @@ if __name__ == "__main__":
         sys.exit("Variable: " + str(variable) + " does not exist in netcdf4 file.")
     #import ipdb; ipdb.set_trace()
 
+    #find unlimited dimension
+    findunlim=[ifile.dimensions[dim].isunlimited() for dim in ifile.dimensions.keys()]
+    dim_unlim_num=[i for i, x in enumerate(findunlim) if x]
+    if len(dim_unlim_num)==0:
+        lg.error("Input file: " + str(os.path.basename(file))  + " has no unlimited dimension, which dim is time?")
+        sys.exit("Input file: " + str(os.path.basename(file))  + " has no unlimited dimension, which dim is time?")
+    elif len(dim_unlim_num)>1:
+        lg.error("Input file: " + str(os.path.basename(file))  + " has more than one unlimited dimension.")
+        sys.exit("Input file: " + str(os.path.basename(file))  + " has more than one unlimited dimension.")
+    else:
+        timename=ifile.dimensions.keys()[dim_unlim_num[0]]
+        var_timedim=[i for i, x in enumerate(ifile.variables[variable].dimensions) if x==timename][0]
+
     varone=ifile.variables[variable][:]
 
-    #create_plot(varone)
+    create_plot(varone,var_timedim,workingfol)
 
-    #put useful code here!
 
     lg.info('')
     localtime = time.asctime( time.localtime(time.time()) )
