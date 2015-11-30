@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 #   Author: Christopher Bull. 
 #   Affiliation: Climate Change Research Centre and ARC Centre of Excellence for Climate System Science.
 #                Level 4, Mathews Building
@@ -26,9 +27,9 @@ This is a python script for making movies. In can be used in two ways:
 Interface is by command line.
 
 Usage:
-    main.py -h
-    main.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
-    main.py --stitch [-o OUTPATH] FILE_NAMES...
+    mkmov.py -h
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
+    mkmov.py --stitch [-o OUTPATH] FILE_NAMES...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -47,15 +48,15 @@ Options:
 
 Examples: 
 
-python main.py --help
+python mkmov.py --help
 
-python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
+python mkmov.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
 
-python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+python mkmov.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
 
-python main.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+python mkmov.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
 
-python main.py --stitch -o ~/temp/movie.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/analysis/nemo_cordex24_FLATFCNG_ERAI01_sepfinder/19940101_sepfinderplots/moviepar0000*
+python mkmov.py --stitch -o ~/temp/movie.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/analysis/nemo_cordex24_FLATFCNG_ERAI01_sepfinder/19940101_sepfinderplots/moviepar0000*
 
 """
 
