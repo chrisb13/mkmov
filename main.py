@@ -19,21 +19,21 @@
 
 """
 MkMov v0.3
-This is a python script for making movies from a netCDF file. Interface is by command line.
+This is a python script for making movies. In can be used in two ways:
+    1] from a netCDF file
+    2] from a list of png files (use --stitch option)
 
-Examples: 
-python main.py --help
-python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
-python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
-python main.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+Interface is by command line.
 
 Usage:
     main.py -h
-    main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
+    main.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
+    main.py --stitch [-o OUTPATH] FILE_NAMES...
 
 Arguments:
     VARIABLE_NAME   variable name
     FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
+    FILE_NAMES      list of files to stich with ffmpeg 
 
 Options:
     -h,--help                   : show this help message
@@ -42,6 +42,21 @@ Options:
     --max MAXIMUM               : the maximum value for the contour map
                                     (nb: if you select a max, you must select a min.)
     --preview                   : show a preview of the plot (will exit afterwards)
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
+
+Examples: 
+
+python main.py --help
+
+python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
+
+python main.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+
+python main.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
+
+python main.py --stitch -o ~/temp/movie.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/analysis/nemo_cordex24_FLATFCNG_ERAI01_sepfinder/19940101_sepfinderplots/moviepar0000*
+
 """
 
 from docopt import docopt
@@ -95,27 +110,40 @@ def dispay_passed_args(workingfolder):
     lg.info("-----------------------------------------------------------------")
     lg.info("MkMov has been run with the following options...")
 
-    if len(arguments['FILE_NAME'])==1:
-        lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
-    elif len(arguments['FILE_NAME'])>1:
-        lg.info("We are making a movie of file(s): ")
-        for cnt,f in enumerate(arguments['FILE_NAME']):
-            lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
+    if arguments['FILE_NAME']!=[]:
+        if len(arguments['FILE_NAME'])==1:
+            lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
+        elif len(arguments['FILE_NAME'])>1:
+            lg.info("We are making a movie of file(s): ")
+            for cnt,f in enumerate(arguments['FILE_NAME']):
+                lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
 
-    lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
+        lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
 
-    lg.info("Our working directory is: "+ workingfolder)
+        lg.info("Our working directory is: "+ workingfolder)
 
-    lg.info("")
-    lg.info("Optional settings:")
+        lg.info("")
+        lg.info("Optional settings:")
 
-    #for optional parameters...
-    if (arguments['--min'] is not None) and (arguments['--max'] is not None):
-        lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
+        #for optional parameters...
+        if (arguments['--min'] is not None) and (arguments['--max'] is not None):
+            lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
 
-    if arguments['--preview']:
-        lg.info("You have opted to preview your plot before making a movie.")
-    lg.info("-----------------------------------------------------------------")
+        if arguments['--preview']:
+            lg.info("You have opted to preview your plot before making a movie.")
+
+        if arguments['-o']:
+            lg.info("You have specified you want your movie to live in: " + arguments['-o'])
+        lg.info("-----------------------------------------------------------------")
+    elif arguments['FILE_NAMES']!=[]:
+        lg.info("We are making a movie from your passed list of png files.")
+        lg.info("Our working directory is: "+ workingfolder)
+        lg.info("")
+        lg.info("Optional settings:")
+
+        if arguments['-o']:
+            lg.info("You have specified you want your movie to live in: " + arguments['-o'])
+        lg.info("-----------------------------------------------------------------")
     return
 
 
@@ -272,11 +300,15 @@ class MovMaker(object):
         #ollie's command didn't work on storm
         #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
 
-        os.chdir(self.workingfolder)
-        subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
+        if arguments['-o']:
+            os.chdir(self.workingfolder)
+            subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True)
+        else:
+            os.chdir(self.workingfolder)
+            subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
 
         #remove png
-        if os.path.isfile(self.workingfolder+'movie.mov'):
+        if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
             ifiles=sorted(glob.glob(self.workingfolder+ 'moviepar*.png' ))
             assert(ifiles!=[]),"glob didn't find anything!"
             for f in ifiles:
@@ -288,6 +320,41 @@ class MovMaker(object):
             lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
             sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
 
+def stitch_action(workingfolder):
+    """function to stitch files together using ffmpeg
+
+    :workingfolder: directory where we will create some symlinks
+    :returns: @todo
+    """
+    framecnt=1
+    for infile in arguments['FILE_NAMES']:
+        os.symlink(infile,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+
+        framecnt+=1
+
+    if arguments['-o']:
+        os.chdir(workingfolder)
+        subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True)
+    else:
+        os.chdir(workingfolder)
+        subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
+
+    #remove png
+    if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
+        ifiles=sorted(glob.glob(workingfolder+ 'moviepar*.png' ))
+        assert(ifiles!=[]),"glob didn't find any symlinks to remove anything!"
+        for f in ifiles:
+            os.remove(f)
+
+        if os.path.isfile(workingfolder+'movie.mov'):
+            lg.info("MkMov SUCCESS, check it out: "+workingfolder+'movie.mov')
+        if os.path.isfile(arguments['-o']):
+            lg.info("MkMov SUCCESS, check it out: "+arguments['-o'])
+    else:
+        lg.info("MkMov FAIL")
+        lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+        sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+
 if __name__ == "__main__": 
     LogStart('',fout=False)
     #print arguments
@@ -297,16 +364,23 @@ if __name__ == "__main__":
 
     check_dependencies()
 
-    from netCDF4 import Dataset
-    import matplotlib.pyplot as plt
-    import numpy as np
+    #We are in making movie mode...
+    #main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
+    if arguments['FILE_NAME']!=[]:
+        from netCDF4 import Dataset
+        import matplotlib.pyplot as plt
+        import numpy as np
 
-    movmk=MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol)
+        movmk=MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol)
 
-    #aah I've always wanted to say this!
-    movmk.lights()
-    movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
-    movmk.action()
+        #aah I've always wanted to say this!
+        movmk.lights()
+        movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
+        movmk.action()
+    #We are in stitching mode
+    #main.py --stitch  FILE_NAMES...
+    elif arguments['FILE_NAMES']!=[]:
+        stitch_action(workingfol)
 
     lg.info('')
     localtime = time.asctime( time.localtime(time.time()) )
