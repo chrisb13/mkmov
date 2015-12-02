@@ -349,8 +349,10 @@ def stitch_action(workingfolder):
 
         if os.path.isfile(workingfolder+'movie.mov'):
             lg.info("MkMov SUCCESS, check it out: "+workingfolder+'movie.mov')
-        if os.path.isfile(arguments['-o']):
-            lg.info("MkMov SUCCESS, check it out: "+arguments['-o'])
+
+        if arguments['-o']:
+            if os.path.isfile(arguments['-o']):
+                lg.info("MkMov SUCCESS, check it out: "+arguments['-o'])
     else:
         lg.info("MkMov FAIL")
         lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
