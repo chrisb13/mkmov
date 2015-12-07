@@ -77,10 +77,6 @@ def check_dependencies():
     :returns: 
     """
 
-    #This is the error message if ffmpeg is not installed...
-    #The program 'ffmpeg' is currently not installed.  You can install it by typing:
-        #sudo apt-get install libav-tools
-
     #See:
     #http://stackoverflow.com/questions/14050281/how-to-check-if-a-python-module-exists-without-importing-it
     try:
@@ -101,6 +97,16 @@ def check_dependencies():
         lg.error("You don't have the numpy library!")
         sys.exit("You don't have the numpy library!")
 
+    #This is the error message if ffmpeg is not installed...
+    #The program 'ffmpeg' is currently not installed.  You can install it by typing:
+        #sudo apt-get install libav-tools
+    try:
+        subprocess.call(["ffmpeg", "--version"])
+    except OSError as e:
+        lg.error("You don't have ffmpeg installed!")
+        sys.exit("You don't have ffmpeg installed!")
+
+    lg.info("Good news: you seem to have all the right software installed!")
 
 def dispay_passed_args(workingfolder):
     """function to print out the passed arguments to the logger
