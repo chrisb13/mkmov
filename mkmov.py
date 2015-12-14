@@ -42,7 +42,7 @@ Options:
                                     (nb: if you select a min, you must select a max.)
     --max MAXIMUM               : the maximum value for the contour map
                                     (nb: if you select a max, you must select a min.)
-    --preview                   : show a preview of the plot (will exit afterwards)
+    --preview                   : show a preview of the plot (will exit afterwards).
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
@@ -57,6 +57,13 @@ python mkmov.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cor
 python mkmov.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
 
 python mkmov.py --stitch -o ~/temp/movie.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/analysis/nemo_cordex24_FLATFCNG_ERAI01_sepfinder/19940101_sepfinderplots/moviepar0000*
+
+Tests:
+
+python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 
 """
 
@@ -295,7 +302,21 @@ class MovMaker(object):
                 fig.clf()
                 del ax
                 framecnt+=1
+
             ifile.close()
+
+        #attemp at adding logo at end.
+        #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001.png'
+        ##logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
+        #for more in range(5):
+            #os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+            #framecnt+=1
+        #gave up, these could be helpful though:
+        #http://superuser.com/questions/628827/can-ffmpeg-encode-video-from-frames-of-different-sizes
+        #http://superuser.com/questions/803314/ffmpeg-combine-pngs-of-different-size-into-movie
+
+        #doesn't seem to be supported by my version :(
+        #http://ksloan.net/watermarking-videos-from-the-command-line-using-ffmpeg-filters/
 
     def action(self):
         """function to stitch the movies together!
