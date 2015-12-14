@@ -315,7 +315,7 @@ class MovMaker(object):
             subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
 
         #remove png
-        if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
+        if os.path.isfile(self.workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
             ifiles=sorted(glob.glob(self.workingfolder+ 'moviepar*.png' ))
             assert(ifiles!=[]),"glob didn't find anything!"
             for f in ifiles:
@@ -377,9 +377,10 @@ if __name__ == "__main__":
     #main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
     if arguments['FILE_NAME']!=[]:
         from netCDF4 import Dataset
-        #for travis-ci
-        import matplotlib
-        matplotlib.use('Agg')
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         import numpy as np
 
