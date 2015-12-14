@@ -1,6 +1,9 @@
 #hacked from:
 #http://conda.pydata.org/docs/travis.html
 #https://github.com/xray/xray/blob/master/.travis.yml
+
+#ffmpeg line from: https://github.com/shoes/shoes/blob/develop/.travis.yml
+before_script: "sudo aptitude -y -q install libcairo2-dev libpixman-1-dev libpango1.0-dev libgif-dev libjpeg-dev libgtk2.0-dev vlc libvlc-dev portaudio19-dev libsqlite3-dev libcurl4-openssl-dev makeself curl"
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
@@ -27,5 +30,5 @@ install:
   - source activate test-environment
   - python setup.py install
 
-#script:
-  # Your test script goes here
+script:
+  - python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
