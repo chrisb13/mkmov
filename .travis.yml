@@ -2,9 +2,14 @@
 #http://conda.pydata.org/docs/travis.html
 #https://github.com/xray/xray/blob/master/.travis.yml
 
+#from: https://github.com/joker1007/activejob-ffmpeg/blob/master/.travis.yml
+before_install:
+  - ci/install_ffmpeg
+  - export PATH=`pwd`/ffmpeg:$PATH
+
 #ffmpeg line from: https://github.com/shoes/shoes/blob/develop/.travis.yml
 #before_script: "sudo aptitude -y -q install libcairo2-dev libpixman-1-dev libpango1.0-dev libgif-dev libjpeg-dev libgtk2.0-dev vlc libvlc-dev portaudio19-dev libsqlite3-dev libcurl4-openssl-dev makeself curl"
-before_script: "sudo aptitude -y -q install ffmpeg"
+#before_script: "sudo aptitude -y -q install ffmpeg"
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
