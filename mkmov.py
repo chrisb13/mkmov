@@ -377,6 +377,9 @@ if __name__ == "__main__":
     #main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
     if arguments['FILE_NAME']!=[]:
         from netCDF4 import Dataset
+        #for travis-ci
+        import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         import numpy as np
 
