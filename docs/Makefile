@@ -7,6 +7,9 @@ SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
 
+#for sphinx docs auto script from http://blog.nikhilism.com/2012/08/automatic-github-pages-generation-from.html
+GH_PAGES_SOURCES = docs
+
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
 $(error The '$(SPHINXBUILD)' command was not found. Make sure you have Sphinx installed, then set the SPHINXBUILD environment variable to point to the full path of the '$(SPHINXBUILD)' executable. Alternatively you can add the directory with the executable to your PATH. If you don't have Sphinx installed, grab it from http://sphinx-doc.org/)
@@ -55,6 +58,18 @@ html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+gh-pages:
+	git checkout gh-pages
+	rm -rf *.html _sources _static *.inv *.js
+	cd ../;git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	make html
+	mv -fv _build/html/* ./
+	git add -A
+	git reset -- docs/
+	cd ../;git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages 
+	cd ../;git checkout master
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
