@@ -46,30 +46,55 @@
 <div class="highlight-python"><div class="highlight"><pre>#First activate python environment that has matplotlib and netCDF4 packages..
 git clone ...
 cd mkmov
-python main.py FILE_NAME VARIABLE_NAME
+python mkmov.py FILE_NAME VARIABLE_NAME
 </pre></div>
 </div>
-<p>That&#8217;s it! A .mov file will appear in your mkmov folder with your movie.</p>
+<p>That&#8217;s it! A .mov file will appear in a temporary directory as directed by the output (alternatively suggest an absoolute path with -o option, details below).</p>
 <div class="section" id="more-advanced-usage">
 <h2>More advanced usage<a class="headerlink" href="#more-advanced-usage" title="Permalink to this headline">¶</a></h2>
-<p>Details to this section are ongoing as optional arguments are added.</p>
-<div class="highlight-python"><div class="highlight"><pre>MkMov v0.1
-This is a python script for making movies from a netCDF file.
-
-Example: python main.py /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc tos
-
-Usage:
-    main.py -h
-    main.py FILE_NAME VARIABLE_NAME
-
-Arguments:
-    FILE_NAME       path to NetCDF file to make movie
-    VARIABLE_NAME   variable name
-
-Options:
-    -h,--help          : show this help message
-</pre></div>
-</div>
+<p>Details to this section are ongoing as optional arguments are added.
+::
+MkMov v0.3
+This is a python script for making movies. In can be used in two ways:</p>
+<blockquote>
+<div>1] from a netCDF file
+2] from a list of png files (use &#8211;stitch option)</div></blockquote>
+<p>Interface is by command line.</p>
+<dl class="docutils">
+<dt>Usage:</dt>
+<dd>mkmov.py -h
+mkmov.py [&#8211;min MINIMUM &#8211;max MAXIMUM &#8211;preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
+mkmov.py &#8211;stitch [-o OUTPATH] FILE_NAMES...</dd>
+<dt>Arguments:</dt>
+<dd>VARIABLE_NAME   variable name
+FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
+FILE_NAMES      list of files to stich with ffmpeg</dd>
+<dt>Options:</dt>
+<dd><p class="first">-h,&#8211;help                   : show this help message
+&#8211;min MINIMUM               : the minimum value for the contour map</p>
+<blockquote>
+<div>(nb: if you select a min, you must select a max.)</div></blockquote>
+<table class="last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">--max <var>MAXIMUM</var></span></kbd></td>
+<td>: the maximum value for the contour map
+(nb: if you select a max, you must select a min.)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--preview</span></kbd></td>
+<td>: show a preview of the plot (will exit afterwards).</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>OUTPATH</var></span></kbd></td>
+<td>: path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">--stitch</span></kbd></td>
+<td>: stitch png files together with ffmpeg (files must be the same dimensions)</td></tr>
+</tbody>
+</table>
+</dd>
+</dl>
 </div>
 </div>
 
