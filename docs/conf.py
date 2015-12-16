@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MkMov'
-copyright = u'2015, Christopher Bull and Oliver Angelil'
-author = u'Christopher Bull and Oliver Angelil'
+copyright = u'2015, Christopher Bull'
+author = u'Christopher Bull'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -223,7 +223,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'MkMov.tex', u'MkMov Documentation',
-   u'Christopher Bull and Oliver Angelil', 'manual'),
+   u'Christopher Bull', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
