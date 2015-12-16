@@ -67,6 +67,7 @@ gh-pages:
 	make html
 	rm -rf ../_sources ../_static; mv -fv _build/html/* ../
 	cd ../;git add -A
+	git reset -- docs
 	cd ../;git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages 
 	cd ../;git checkout master
 

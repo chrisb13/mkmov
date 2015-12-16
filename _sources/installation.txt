@@ -37,3 +37,18 @@ To install ffmpeg, assuming you are on a *nix system, then:
 ::
     sudo apt-get install ffmpeg
 
+Maybe that didn't work? If you're using Linux `Mint`_ this works:
+::
+    sudo add-apt-repository ppa:mc3man/trusty-media
+    sudo apt-get update
+    sudo apt-get install ffmpeg
+
+.. _Mint: https://mintguide.org/video/339-installing-ffmpeg-library-on-linux-mint-via-ppa.html
+
+
+------------
+Travis-CI environments using Conda
+------------
+This package is tested with Travis-CI to see how these environments are set up have a look at this `file`_.
+
+.. _file: https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml

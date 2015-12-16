@@ -65,6 +65,16 @@
 <div class="highlight-python"><div class="highlight"><pre>sudo apt-get install ffmpeg
 </pre></div>
 </div>
+<p>Maybe that didn&#8217;t work? If you&#8217;re using Linux <a class="reference external" href="https://mintguide.org/video/339-installing-ffmpeg-library-on-linux-mint-via-ppa.html">Mint</a> this works:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo add-apt-repository ppa:mc3man/trusty-media
+sudo apt-get update
+sudo apt-get install ffmpeg
+</pre></div>
+</div>
+</div>
+<div class="section" id="travis-ci-environments-using-conda">
+<h2>Travis-CI environments using Conda<a class="headerlink" href="#travis-ci-environments-using-conda" title="Permalink to this headline">¶</a></h2>
+<p>This package is tested with Travis-CI to see how these environments are set up have a look at this <a class="reference external" href="https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml">file</a>.</p>
 </div>
 </div>
 
@@ -79,6 +89,7 @@
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#matplotlib-and-netcdf4">Matplotlib and netCDF4</a></li>
 <li><a class="reference internal" href="#ffmpeg">FFMPEG</a></li>
+<li><a class="reference internal" href="#travis-ci-environments-using-conda">Travis-CI environments using Conda</a></li>
 </ul>
 </li>
 </ul>
@@ -116,7 +127,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2015, Christopher Bull.
+      &copy;2015, Christopher Bull and Oliver Angelil.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
