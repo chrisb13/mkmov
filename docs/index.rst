@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MkMov's documentation!
+MkMov documentation!
 =================================
+
+.. image:: https://raw.githubusercontent.com/chrisb13/mkmov/master/img/mkmovlogo001.png
 
 Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or stitch together a series of *.png files. Interface is by command line and everything is done in one line!
 
