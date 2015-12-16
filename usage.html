@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to MkMov’s documentation! &mdash; MkMov 0.1 documentation</title>
+    <title>Usage &mdash; MkMov 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,8 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="MkMov 0.1 documentation" href="#" />
-    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="top" title="MkMov 0.1 documentation" href="index.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -37,34 +38,39 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-mkmov-s-documentation">
-<h1>Welcome to MkMov&#8217;s documentation!<a class="headerlink" href="#welcome-to-mkmov-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or stitch together a series of <a href="#id1"><span class="problematic" id="id2">*</span></a>.png files. Interface is by command line and everything is done in one line!</p>
-<p>Already have matplotlib, netCDF4 and ffmpeg? Jump straight to usage. Otherwise have a look at our install section.</p>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#matplotlib-and-netcdf4">Matplotlib and netCDF4</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#ffmpeg">FFMPEG</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#more-advanced-usage">More advanced usage</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="all-about-us.html">All about us</a></li>
-</ul>
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to MkMov. This utility is designed to make a movie from a NetCDF file.</p>
+<p>We have tried to make this program as easy to install and use as possible.</p>
+<p>Basic usage is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>#First activate python environment that has matplotlib and netCDF4 packages..
+git clone ...
+cd mkmov
+python main.py FILE_NAME VARIABLE_NAME
+</pre></div>
+</div>
+<p>That&#8217;s it! A .mov file will appear in your mkmov folder with your movie.</p>
+<div class="section" id="more-advanced-usage">
+<h2>More advanced usage<a class="headerlink" href="#more-advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>Details to this section are ongoing as optional arguments are added.</p>
+<div class="highlight-python"><div class="highlight"><pre>MkMov v0.1
+This is a python script for making movies from a netCDF file.
+
+Example: python main.py /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc tos
+
+Usage:
+    main.py -h
+    main.py FILE_NAME VARIABLE_NAME
+
+Arguments:
+    FILE_NAME       path to NetCDF file to make movie
+    VARIABLE_NAME   variable name
+
+Options:
+    -h,--help          : show this help message
+</pre></div>
 </div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
-</ul>
 </div>
 
 
@@ -73,23 +79,26 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to MkMov&#8217;s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#more-advanced-usage">More advanced usage</a></li>
+</ul>
+</li>
 </ul>
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
+      <li><a href="_sources/usage.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -118,7 +127,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
       
       |
-      <a href="_sources/index.txt"
+      <a href="_sources/usage.txt"
           rel="nofollow">Page source</a>
     </div>
 
