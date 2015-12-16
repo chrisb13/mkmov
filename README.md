@@ -1,7 +1,13 @@
 ![alt tag](https://raw.github.com/chrisb13/mkmov/master/img/mkmovlogo001.png)
 
+# Travis-ci status
+[![Build Status](https://travis-ci.org/chrisb13/mkmov.svg)](https://travis-ci.org/chrisb13/mkmov)
+
 # mkmov
-python movie maker for NetCDF files
+Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or stitch together a series of *.png files. Interface is by command line and everything is done in one line!
+
+# Official Documentation
+[Official documentation here.](http://christopherbull.com.au/mkmov/)
 
 # Usage
 ```
@@ -52,17 +58,13 @@ python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_200401
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 ```
 
-# Travis-ci status
-[![Build Status](https://travis-ci.org/chrisb13/mkmov.svg)](https://travis-ci.org/chrisb13/mkmov)
+## Contact      
 
-# tutorial I followed to create sphinx docs
-http://dont-be-afraid-to-commit.readthedocs.org/en/latest/documentation.html
+Christopher Bull.   
+Climate Change Research Centre and ARC Centre of Excellence for Climate System Science.
+University of New South Wales                                           Sydney, NSW, Australia, 2052     
+e: z3457920@student.unsw.edu.au                                     
+w: christopherbull.com.au
+gh: github.com/chrisb13
+t: @ChrisBullOceanO
 
-Also see:
-http://stackoverflow.com/questions/1553800/how-to-upload-html-documentation-generated-from-sphinx-to-github
-https://daler.github.io/sphinxdoc-test/includeme.html
-
-Okay, I think this is the guide to use:
-http://raxcloud.blogspot.com.au/2013/02/documenting-python-code-using-sphinx.html
-
-Ollie want to implement? Just use the last link I think...

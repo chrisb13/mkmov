@@ -18,7 +18,7 @@ Contents:
    installation
    usage
    examples
-   all-about-us
+   all-about-me
 
 
 
