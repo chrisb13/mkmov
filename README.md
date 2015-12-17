@@ -10,6 +10,8 @@ Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or
 [Official documentation here.](http://christopherbull.com.au/mkmov/)
 
 # Usage
+[![asciicast](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.png)](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo)
+
 ```
 MkMov v0.3
 This is a python script for making movies. In can be used in two ways:
