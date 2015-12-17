@@ -62,7 +62,7 @@ python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
 References:
-    [1]
+    [1] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
 from docopt import docopt
@@ -370,7 +370,7 @@ class MovMaker(object):
         if arguments['--fps']:
             fps=str(int(arguments['--fps']))
         else:
-            fps=15
+            fps=str(15)
 
         if arguments['-o']:
             os.chdir(self.workingfolder)
@@ -416,7 +416,7 @@ def stitch_action(workingfolder):
     if arguments['--fps']:
         fps=str(int(arguments['--fps']))
     else:
-        fps=15
+        fps=str(15)
 
     FNULL = open(os.devnull, 'w')
     if arguments['-o']:

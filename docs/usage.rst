@@ -92,4 +92,4 @@ Details to this section are ongoing as optional arguments are added.
     python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
     References:
-        [1]
+        [1]  http://matplotlib.org/examples/color/colormaps_reference.html
