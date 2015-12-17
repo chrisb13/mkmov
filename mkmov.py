@@ -306,11 +306,11 @@ class MovMaker(object):
             ifile.close()
 
         #attemp at adding logo at end.
-        #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001.png'
-        ##logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
-        #for more in range(5):
-            #os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
-            #framecnt+=1
+        logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_splash.png'
+        #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
+        for more in range(5):
+            os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+            framecnt+=1
         #gave up, these could be helpful though:
         #http://superuser.com/questions/628827/can-ffmpeg-encode-video-from-frames-of-different-sizes
         #http://superuser.com/questions/803314/ffmpeg-combine-pngs-of-different-size-into-movie
