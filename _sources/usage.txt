@@ -39,6 +39,10 @@ Here's a full example:
 
 Note: you can pause the script and copy the code!
 
+There are more working examples in run_mkmov_examples.sh (in the root of the repository). A netCDF file and some example png files are included in the examples folder, so these examples should work 'out of the box'. Indeed, these same examples form our `testing`_ suite!
+
+.. _testing: https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml
+
 --------------------
 More advanced usage
 --------------------
@@ -50,12 +54,12 @@ Details to this section are ongoing as optional arguments are added.
         1] from a netCDF file
         2] from a list of png files (use --stitch option)
 
-    Interface is by command line.
+    Interface is by command line. Fully working examples can be found in: run_mkmov_examples.sh
 
     Usage:
         mkmov.py -h
-        mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
-        mkmov.py --stitch [-o OUTPATH] FILE_NAMES...
+        mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS] VARIABLE_NAME FILE_NAME...
+        mkmov.py --stitch [-o OUTPATH --fps FRATE] FILE_NAMES...
 
     Arguments:
         VARIABLE_NAME   variable name
@@ -70,4 +74,22 @@ Details to this section are ongoing as optional arguments are added.
                                         (nb: if you select a max, you must select a min.)
         --preview                   : show a preview of the plot (will exit afterwards).
         -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+        --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
+        --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
+        --cmap PLTCMAP              : matplotlib color map to contourf with
+        --clev LEVELS               : number of colour levels to have on the contour map (default is 30). See [1] for options.
         --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
+
+    Example tests (should work 'out of the box'):
+    python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
+    python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
+
+    References:
+        [1]

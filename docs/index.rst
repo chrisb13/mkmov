@@ -18,7 +18,7 @@ Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or ch
 
     <script type="text/javascript" src="https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.js" id="asciicast-7etd14t6r4wqsccipcduhcrgo" async></script>
 
-Need to install some python packages? Have a look at the install section...
+Need to install some python packages or ffmpeg? Have a look at the installation section...
 
 Contents:
 
@@ -30,7 +30,6 @@ Contents:
    examples
    contributing
    all-about-me
-
 
 
 Indices and tables
