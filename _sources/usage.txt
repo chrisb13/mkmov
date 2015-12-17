@@ -3,18 +3,41 @@
 Usage
 ############
 
-Welcome to MkMov. This utility is designed to make a movie from a NetCDF file.
+--------------------
+Basic usage
+--------------------
+
+This utility is designed to:
+
+#. make a movie from a NetCDF file or 
+#. stitch together a series of *.png files. 
+
+Interface is by command line and everything is done in one line!
 
 We have tried to make this program as easy to install and use as possible.
 
-Basic usage is as follows: 
+Basic usage, to make a movie from a netCDF file is as follows: 
 ::
-    #First activate python environment that has matplotlib and netCDF4 packages..
-    git clone ...
+    #First activate python environment that has matplotlib, numpy and netCDF4 packages..
+    git clone https://github.com/chrisb13/mkmov
     cd mkmov
-    python mkmov.py FILE_NAME VARIABLE_NAME
+    python mkmov.py VARIABLE_NAME FILE_NAME
 That's it! A .mov file will appear in a temporary directory as directed by the output (alternatively suggest an absoolute path with -o option, details below).
 
+Usage, to make a movie from a list of png files is as follows: 
+::
+    #First activate python environment that has matplotlib, numpy and netCDF4 packages..
+    git clone https://github.com/chrisb13/mkmov
+    cd mkmov
+    python mkmov.py --stitch *.png FILE_NAMES
+
+Here's a full example:
+
+.. raw:: html
+
+    <script type="text/javascript" src="https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.js" id="asciicast-7etd14t6r4wqsccipcduhcrgo" async></script>
+
+Note: you can pause the script and copy the code!
 
 --------------------
 More advanced usage
