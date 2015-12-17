@@ -8,6 +8,7 @@ We have tried to keep dependencies to a minimum. Most users working with climate
 MkMov requires:
 
 * matplotlib
+* numpy
 * netCDF4
 * ffmpeg
 
@@ -15,11 +16,11 @@ MkMov requires:
 
 If you're not sure if you have the right packages or not, skip to usage and try and run mkmov and it will tell you if you do not have the correct python packages and ffmpeg.
 
-------------
-Matplotlib and netCDF4
-------------
+-----------------------------
+Matplotlib, numpy and netCDF4
+-----------------------------
 
-There are a number of ways to install the python packages matplotlib and netCDF4 we recommend Anaconda. 
+There are a number of ways to install the python packages matplotlib, numpy and netCDF4, Anaconda is recommend. 
 
 Steps:
 
@@ -45,10 +46,9 @@ Maybe that didn't work? If you're using Linux `Mint`_ this works:
 
 .. _Mint: https://mintguide.org/video/339-installing-ffmpeg-library-on-linux-mint-via-ppa.html
 
-
-------------
+------------------------------------------
 Travis-CI environments using Conda
-------------
+------------------------------------------
 This package is tested with Travis-CI to see how these environments are set up have a look at this `file`_.
 
 .. _file: https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml

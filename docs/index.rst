@@ -12,7 +12,7 @@ This utility is designed to make a movie from a NetCDF file or stitch together a
 
 .. _Github: https://github.com/chrisb13/mkmov
 
-Already have matplotlib, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)
+Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)
 
 .. raw:: html
 
@@ -28,6 +28,7 @@ Contents:
    installation
    usage
    examples
+   contributing
    all-about-me
 
 
