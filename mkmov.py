@@ -308,7 +308,7 @@ class MovMaker(object):
         #attemp at adding logo at end.
         logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
         #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
-        for more in range(5):
+        for more in range(20):
             os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
             framecnt+=1
         #gave up, these could be helpful though:
@@ -360,13 +360,11 @@ def stitch_action(workingfolder):
 
         framecnt+=1
 
-
-    # #attemp at adding logo at end.
-    # logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
-    # for more in range(5):
-        # os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
-        # framecnt+=1
-
+    #adding logo at end.
+    logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
+    for more in range(20):
+        os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+        framecnt+=1
 
     if arguments['-o']:
         os.chdir(workingfolder)
