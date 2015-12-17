@@ -74,6 +74,7 @@ from cb2logger import *
 import imp
 import tempfile
 import subprocess
+
 import glob
 
 def check_dependencies():
@@ -108,7 +109,8 @@ def check_dependencies():
     #The program 'ffmpeg' is currently not installed.  You can install it by typing:
         #sudo apt-get install libav-tools
     try:
-        subprocess.call(["ffmpeg", "--version"])
+        FNULL = open(os.devnull, 'w')
+        subprocess.call(["ffmpeg", "--version"],stdout=FNULL, stderr=subprocess.STDOUT)
     except OSError as e:
         lg.error("You don't have ffmpeg installed!")
         sys.exit("You don't have ffmpeg installed!")
@@ -328,12 +330,16 @@ class MovMaker(object):
         #ollie's command didn't work on storm
         #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
 
+
+        FNULL = open(os.devnull, 'w')
+
+        lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
         if arguments['-o']:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True)
+            subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         else:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
+            subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
         #remove png
         if os.path.isfile(self.workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
@@ -366,12 +372,15 @@ def stitch_action(workingfolder):
         os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
         framecnt+=1
 
+    lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
+    FNULL = open(os.devnull, 'w')
     if arguments['-o']:
         os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True)
+        subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        
     else:
         os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r 15 -qscale 3 -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True)
+        subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #remove png
     if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
