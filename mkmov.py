@@ -24,12 +24,12 @@ This is a python script for making movies. In can be used in two ways:
     1] from a netCDF file
     2] from a list of png files (use --stitch option)
 
-Interface is by command line.
+Interface is by command line. Fully working examples can be found in: run_mkmov_examples.sh
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH] VARIABLE_NAME FILE_NAME...
-    mkmov.py --stitch [-o OUTPATH] FILE_NAMES...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS] VARIABLE_NAME FILE_NAME...
+    mkmov.py --stitch [-o OUTPATH --fps FRATE] FILE_NAMES...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -44,27 +44,25 @@ Options:
                                     (nb: if you select a max, you must select a min.)
     --preview                   : show a preview of the plot (will exit afterwards).
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
+    --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
+    --cmap PLTCMAP              : matplotlib color map to contourf with
+    --clev LEVELS               : number of colour levels to have on the contour map (default is 30). See [1] for options.
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
-Examples: 
-
-python mkmov.py --help
-
-python mkmov.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/1989/cordex24-ERAI01_1d_19890101_19890105_grid_T_2D.nc 
-
-python mkmov.py tos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
-
-python mkmov.py --min -1 --max 1 --preview zos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc 
-
-python mkmov.py --stitch -o ~/temp/movie.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/analysis/nemo_cordex24_FLATFCNG_ERAI01_sepfinder/19940101_sepfinderplots/moviepar0000*
-
-Tests:
-
+Example tests (should work 'out of the box'):
 python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
+python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
+References:
+    [1]
 """
 
 from docopt import docopt
@@ -149,7 +147,23 @@ def dispay_passed_args(workingfolder):
             lg.info("You have opted to preview your plot before making a movie.")
 
         if arguments['-o']:
-            lg.info("You have specified you want your movie to live in: " + arguments['-o'])
+            lg.info("You want your movie to live in: " + arguments['-o'])
+
+        if arguments['--lmask']:
+            lg.info("You want to mask out the following values: " + arguments['--lmask'])
+
+        if arguments['--fps']:
+            lg.info("You have said your final movie will be: " + \
+                    str(int(arguments['--fps']))+"  frames per second.")
+
+        if arguments['--cmap']:
+            lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
+                    arguments['--cmap'])
+
+        if arguments['--clev']:
+            lg.info("You have said you would like to contourf with the following number of levels: " + \
+                    str(int(arguments['--clev'])))
+
         lg.info("-----------------------------------------------------------------")
     elif arguments['FILE_NAMES']!=[]:
         lg.info("We are making a movie from your passed list of png files.")
@@ -159,6 +173,11 @@ def dispay_passed_args(workingfolder):
 
         if arguments['-o']:
             lg.info("You have specified you want your movie to live in: " + arguments['-o'])
+
+        if arguments['--fps']:
+            lg.info("You have said your final movie will be: " + \
+                    str(int(arguments['--fps']))+"  frames per second.")
+
         lg.info("-----------------------------------------------------------------")
     return
 
@@ -282,14 +301,27 @@ class MovMaker(object):
                 #ax.set_xlabel('msg')
                 #ax.set_ylabel('msg')
 
-                name_of_array= np.ma.masked_where(
-                    name_of_array==0.,
-                    name_of_array) 
+                if arguments['--lmask']:
+                    name_of_array= np.ma.masked_where(
+                        name_of_array==float(arguments['--lmask']),
+                        name_of_array) 
 
-                cs1=plt.contourf(x,y,name_of_array[tstep,:,:],levels=np.linspace(self.minvar,self.maxvar,30))
+                    #land mask...
+                    cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
 
-                #land mask...
-                cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+
+                if arguments['--clev']:
+                    cnt_levelnum=int(arguments['--clev'])
+                else:
+                    cnt_levelnum=30
+
+                if not arguments['--cmap']:
+                    cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
+                else:
+                    cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
+                            cmap=arguments['--cmap'])
 
                 plt.colorbar(cs1)
                 #plt.show()
@@ -334,12 +366,18 @@ class MovMaker(object):
         FNULL = open(os.devnull, 'w')
 
         lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
+
+        if arguments['--fps']:
+            fps=str(int(arguments['--fps']))
+        else:
+            fps=15
+
         if arguments['-o']:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         else:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
         #remove png
         if os.path.isfile(self.workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
@@ -373,14 +411,21 @@ def stitch_action(workingfolder):
         framecnt+=1
 
     lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
+
+
+    if arguments['--fps']:
+        fps=str(int(arguments['--fps']))
+    else:
+        fps=15
+
     FNULL = open(os.devnull, 'w')
     if arguments['-o']:
         os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         
     else:
         os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r 15  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #remove png
     if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
@@ -402,7 +447,7 @@ def stitch_action(workingfolder):
 
 if __name__ == "__main__": 
     LogStart('',fout=False)
-    #print arguments
+    # print arguments
     workingfol=tempfile.mkdtemp()+'/'
 
     dispay_passed_args(workingfol)
