@@ -12,11 +12,17 @@ Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or
 # Usage
 [![asciicast](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.png)](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo)
 
+or
+
 ``` bash
 python mkmov.py -h
 ```
 
 See [usage docs](http://christopherbull.com.au/mkmov/usage.html).
+
+# Usage
+
+Contributions are very welcome, see [contribution section, in the docs](http://christopherbull.com.au/mkmov/contributing.html).
 
 ## Contact      
 
