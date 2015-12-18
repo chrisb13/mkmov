@@ -20,7 +20,7 @@ python mkmov.py -h
 
 See [usage docs](http://christopherbull.com.au/mkmov/usage.html).
 
-# Usage
+# Contributing
 
 Contributions are very welcome, see [contribution section, in the docs](http://christopherbull.com.au/mkmov/contributing.html).
 
