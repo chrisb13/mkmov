@@ -75,6 +75,17 @@ import subprocess
 
 import glob
 
+def mkdir(p):
+    """make directory of path that is passed"""
+    try:
+       os.makedirs(p)
+       lg.info("output folder: "+p+ " does not exist, we will make one.")
+    except OSError as exc: # Python >2.5
+       import errno
+       if exc.errno == errno.EEXIST and os.path.isdir(p):
+          pass
+       else: raise
+
 def check_dependencies():
     """function that checks we have the requireded dependencies, namely:
     * matplotlib
@@ -372,12 +383,23 @@ class MovMaker(object):
         else:
             fps=str(15)
 
+        qscale=' -qscale 3 '
         if arguments['-o']:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         else:
             os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+
+        #qscale doesn't work on some versions of ffmpeg...
+        if not os.path.isfile(self.workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
+            qscale=' '
+            if arguments['-o']:
+                os.chdir(self.workingfolder)
+                subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            else:
+                os.chdir(self.workingfolder)
+                subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
         #remove png
         if os.path.isfile(self.workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
@@ -419,13 +441,23 @@ def stitch_action(workingfolder):
         fps=str(15)
 
     FNULL = open(os.devnull, 'w')
+    qscale=' -qscale 3 '
     if arguments['-o']:
-        os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-        
+        os.chdir(self.workingfolder)
+        subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
     else:
-        os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r '+fps+'  -y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        os.chdir(self.workingfolder)
+        subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+
+    #qscale doesn't work on some versions of ffmpeg...
+    if not os.path.isfile(self.workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
+        qscale=' '
+        if arguments['-o']:
+            os.chdir(self.workingfolder)
+            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        else:
+            os.chdir(self.workingfolder)
+            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #remove png
     if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
@@ -448,7 +480,15 @@ def stitch_action(workingfolder):
 if __name__ == "__main__": 
     LogStart('',fout=False)
     # print arguments
-    workingfol=tempfile.mkdtemp()+'/'
+    if not arguments['-o']:
+        workingfol=tempfile.mkdtemp()+'/'
+    else:
+        workingfol=os.path.dirname(arguments['-o'])+'/mkmovTEMPFOL4_'+\
+                os.path.basename(arguments['-o'])[:-4]+'/'
+        if os.path.exists(workingfol):
+            lg.error("Working folder: " + workingfol+". already exists, has mkmov failed previously? Please remove and restart.")
+            sys.exit("Working folder: " + workingfol+". already exists, has mkmov failed previously? Please remove and restart.")
+        mkdir(workingfol)
 
     dispay_passed_args(workingfol)
 
@@ -476,6 +516,9 @@ if __name__ == "__main__":
     elif arguments['FILE_NAMES']!=[]:
         stitch_action(workingfol)
 
+    if os.path.exists(workingfol):
+        lg.info("Removing working folder: " + workingfol)
+        os.rmdir(workingfol)
     lg.info('')
     localtime = time.asctime( time.localtime(time.time()) )
     lg.info("Local current time : "+ str(localtime))
