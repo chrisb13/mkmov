@@ -443,20 +443,20 @@ def stitch_action(workingfolder):
     FNULL = open(os.devnull, 'w')
     qscale=' -qscale 3 '
     if arguments['-o']:
-        os.chdir(self.workingfolder)
+        os.chdir(workingfolder)
         subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
     else:
-        os.chdir(self.workingfolder)
+        os.chdir(workingfolder)
         subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #qscale doesn't work on some versions of ffmpeg...
-    if not os.path.isfile(self.workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
+    if not os.path.isfile(workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
         qscale=' '
         if arguments['-o']:
-            os.chdir(self.workingfolder)
+            os.chdir(workingfolder)
             subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         else:
-            os.chdir(self.workingfolder)
+            os.chdir(workingfolder)
             subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #remove png
@@ -516,9 +516,14 @@ if __name__ == "__main__":
     elif arguments['FILE_NAMES']!=[]:
         stitch_action(workingfol)
 
-    if os.path.exists(workingfol):
-        lg.info("Removing working folder: " + workingfol)
-        os.rmdir(workingfol)
+    #remove working folder
+    if arguments['-o']:
+        if os.path.exists(workingfol):
+            if not os.listdir(workingfol):
+                os.rmdir(workingfol)
+                lg.info("Working folder: " + workingfol +" removed.")
+            else:
+                lg.warning("Working directory: " + workingfol+" not empty, please remove manually")
     lg.info('')
     localtime = time.asctime( time.localtime(time.time()) )
     lg.info("Local current time : "+ str(localtime))
