@@ -47,7 +47,7 @@ Options:
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
     --cmap PLTCMAP              : matplotlib color map to contourf with
-    --clev LEVELS               : number of colour levels to have on the contour map (default is 30). See [1] for options.
+    --clev LEVELS               : number of colour levels to have on the contour map (default is 50). See [1] for options.
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
 Example tests (should work 'out of the box'):
@@ -324,7 +324,7 @@ class MovMaker(object):
                 if arguments['--clev']:
                     cnt_levelnum=int(arguments['--clev'])
                 else:
-                    cnt_levelnum=30
+                    cnt_levelnum=50
 
                 if not arguments['--cmap']:
                     cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
@@ -373,7 +373,6 @@ class MovMaker(object):
         #ollie's command didn't work on storm
         #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
 
-
         FNULL = open(os.devnull, 'w')
 
         lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
@@ -391,8 +390,16 @@ class MovMaker(object):
             os.chdir(self.workingfolder)
             subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
-        #qscale doesn't work on some versions of ffmpeg...
-        if not os.path.isfile(self.workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
+        #qscale doesn't work on some versions of ffmpeg... Check if we have a file, if not, try no qscale arg
+        nofile=False
+        if not os.path.isfile(self.workingfolder+'movie.mov'):
+            nofile=True
+        
+        if arguments['-o']:
+            if not os.path.isfile(arguments['-o']):
+                nofile=True
+
+        if nofile:
             qscale=' '
             if arguments['-o']:
                 os.chdir(self.workingfolder)
@@ -449,8 +456,16 @@ def stitch_action(workingfolder):
         os.chdir(workingfolder)
         subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
-    #qscale doesn't work on some versions of ffmpeg...
-    if not os.path.isfile(workingfolder+'movie.mov') or not os.path.isfile(arguments['-o']):
+    #qscale doesn't work on some versions of ffmpeg... Check if we have a file, if not, try no qscale arg
+    nofile=False
+    if not os.path.isfile(workingfolder+'movie.mov'):
+        nofile=True
+    
+    if arguments['-o']:
+        if not os.path.isfile(arguments['-o']):
+            nofile=True
+
+    if nofile:
         qscale=' '
         if arguments['-o']:
             os.chdir(workingfolder)
