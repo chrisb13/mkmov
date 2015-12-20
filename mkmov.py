@@ -310,18 +310,34 @@ class MovMaker(object):
             findunlim=[ifile.dimensions[dim].isunlimited() for dim in ifile.dimensions.keys()]
             dim_unlim_num=[i for i, x in enumerate(findunlim) if x]
             if len(dim_unlim_num)==0:
-                lg.error("Input file: " + str(os.path.basename(file))  + " has no unlimited dimension, which dim is time?")
-                sys.exit("Input file: " + str(os.path.basename(file))  + " has no unlimited dimension, which dim is time?")
+                lg.warning("Input file: " + str(os.path.basename(f))  + " has no unlimited dimension, which dim is time?")
+                # sys.exit("Input file: " + str(os.path.basename(f))  + " has no unlimited dimension, which dim is time?")
             elif len(dim_unlim_num)>1:
-                lg.error("Input file: " + str(os.path.basename(file))  + " has more than one unlimited dimension.")
-                sys.exit("Input file: " + str(os.path.basename(file))  + " has more than one unlimited dimension.")
+                lg.warning("Input file: " + str(os.path.basename(f))  + " has more than one unlimited dimension.")
+                # sys.exit("Input file: " + str(os.path.basename(f))  + " has more than one unlimited dimension.")
             else:
                 timename=ifile.dimensions.keys()[dim_unlim_num[0]]
                 var_timedim=[i for i, x in enumerate(ifile.variables[self.variable_name].dimensions) if x==timename][0]
                 var_timedims.append(var_timedim)
+                ifile.close()
+                continue #NOTE I'm a continue!
+
+            #okay so we didn't find time as an unlimited dimension, perhaps it has a sensible name?
+            if 'time' in ifile.dimensions.keys():
+                timename='time'
+            elif 't' in ifile.dimensions.keys():
+                timename='t'
+            else:
+                timename=''
+
+            if timename!='':
+                lg.info("Good news, we think we found the time dimension it's called: " + timename )
+                var_timedim=[i for i, x in enumerate(ifile.variables[self.variable_name].dimensions) if x==timename][0]
+                var_timedims.append(var_timedim)
+
             ifile.close()
 
-        #check all unlimited dimensions are in the same place across all files..
+        #check all time dimensions are in the same place across all files..
         if var_timedims[1:]==var_timedims[:-1]:
             self.timedim=var_timedims[0]
         else:
