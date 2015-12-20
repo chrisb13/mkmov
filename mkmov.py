@@ -192,6 +192,71 @@ def dispay_passed_args(workingfolder):
         lg.info("-----------------------------------------------------------------")
     return
 
+def call_ffmpeg(pngfolder):
+    """function that actually calls ffmpeg to stitch all the png together
+    
+    :pngfolder: folder where all the pngs are that we are stitching together
+    :returns: None (except for a movie!)
+    """
+    #ollie's command didn't work on storm
+    # os.chdir(pngfolder)
+    # subprocess.call('ffmpeg -framerate 10 -y -i moviepar%05d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4')
+
+    # ffmpeg ideas:
+    # ffmpeg -r 15 -i moviepar%05d.png -b 5000k -vcodec libx264 -y -an movie.mov
+
+    lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
+
+    FNULL = open(os.devnull, 'w')
+
+    if arguments['--fps']:
+        fps=str(int(arguments['--fps']))
+    else:
+        fps=str(15)
+
+    quality='20'
+    if arguments['-o']:
+        os.chdir(pngfolder)
+        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png -vb '+quality+'M -y -an '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+    else:
+        os.chdir(pngfolder)
+        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png -vb '+quality+'M -y -an movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+
+    #qscale doesn't work on some versions of ffmpeg... Check if we have a file, if not, try no qscale arg
+    # nofile=False
+    # if not os.path.isfile(pngfolder+'movie.mov'):
+        # nofile=True
+    
+    # if arguments['-o']:
+        # if not os.path.isfile(arguments['-o']):
+            # nofile=True
+
+    # if nofile:
+        # qscale=' '
+        # if arguments['-o']:
+            # os.chdir(pngfolder)
+            # subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        # else:
+            # os.chdir(pngfolder)
+            # subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+
+    #remove png
+    if os.path.isfile(pngfolder+'movie.mov') or os.path.isfile(arguments['-o']):
+        ifiles=sorted(glob.glob(pngfolder+ 'moviepar*.png' ))
+        assert(ifiles!=[]),"glob didn't find any symlinks to remove anything!"
+        for f in ifiles:
+            os.remove(f)
+
+        if os.path.isfile(pngfolder+'movie.mov'):
+            lg.info("MkMov SUCCESS, check it out: "+pngfolder+'movie.mov')
+
+        if arguments['-o']:
+            if os.path.isfile(arguments['-o']):
+                lg.info("MkMov SUCCESS, check it out: "+arguments['-o'])
+    else:
+        lg.info("MkMov FAIL")
+        lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+        sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
 
 
 class MovMaker(object):
@@ -353,15 +418,19 @@ class MovMaker(object):
         #attemp at adding logo at end.
         logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
         #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
+        nologo=False
         for more in range(20):
-            os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+            try:
+                os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+            except OSError:
+                nologo=True
+                break
             framecnt+=1
-        #gave up, these could be helpful though:
-        #http://superuser.com/questions/628827/can-ffmpeg-encode-video-from-frames-of-different-sizes
-        #http://superuser.com/questions/803314/ffmpeg-combine-pngs-of-different-size-into-movie
 
-        #doesn't seem to be supported by my version :(
-        #http://ksloan.net/watermarking-videos-from-the-command-line-using-ffmpeg-filters/
+        if nologo:
+            #on some file systems, like some network shares,  we can't make symlinks ..
+            lg.warning("Couldn't insert the logo at the end, sorry!")
+
 
     def action(self):
         """function to stitch the movies together!
@@ -370,56 +439,7 @@ class MovMaker(object):
         """
         lg.info("Action! Stitching your plots together with ffmpeg...")
 
-        #ollie's command didn't work on storm
-        #ffmpeg -framerate 10 -y -i plot_%04d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4
-
-        FNULL = open(os.devnull, 'w')
-
-        lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
-
-        if arguments['--fps']:
-            fps=str(int(arguments['--fps']))
-        else:
-            fps=str(15)
-
-        qscale=' -qscale 3 '
-        if arguments['-o']:
-            os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-        else:
-            os.chdir(self.workingfolder)
-            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-
-        #qscale doesn't work on some versions of ffmpeg... Check if we have a file, if not, try no qscale arg
-        nofile=False
-        if not os.path.isfile(self.workingfolder+'movie.mov'):
-            nofile=True
-        
-        if arguments['-o']:
-            if not os.path.isfile(arguments['-o']):
-                nofile=True
-
-        if nofile:
-            qscale=' '
-            if arguments['-o']:
-                os.chdir(self.workingfolder)
-                subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-            else:
-                os.chdir(self.workingfolder)
-                subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-
-        #remove png
-        if os.path.isfile(self.workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
-            ifiles=sorted(glob.glob(self.workingfolder+ 'moviepar*.png' ))
-            assert(ifiles!=[]),"glob didn't find anything!"
-            for f in ifiles:
-                os.remove(f)
-
-            lg.info("MkMov SUCCESS, check it out: "+self.workingfolder+'movie.mov')
-        else:
-            lg.info("MkMov FAIL")
-            lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
-            sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+        call_ffmpeg(self.workingfolder)
 
 def stitch_action(workingfolder):
     """function to stitch files together using ffmpeg
@@ -435,62 +455,20 @@ def stitch_action(workingfolder):
 
     #adding logo at end.
     logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
+    nologo=False
     for more in range(20):
-        os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+        try:
+            os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+        except OSError:
+            nologo=True
+            break
         framecnt+=1
 
-    lg.info("Stitching frames together (might take a bit if you have lots of frames)...")
+    if nologo:
+        #on some file systems, like some network shares,  we can't make symlinks ..
+        lg.warning("Couldn't insert the logo at the end, sorry!")
 
-
-    if arguments['--fps']:
-        fps=str(int(arguments['--fps']))
-    else:
-        fps=str(15)
-
-    FNULL = open(os.devnull, 'w')
-    qscale=' -qscale 3 '
-    if arguments['-o']:
-        os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-    else:
-        os.chdir(workingfolder)
-        subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-
-    #qscale doesn't work on some versions of ffmpeg... Check if we have a file, if not, try no qscale arg
-    nofile=False
-    if not os.path.isfile(workingfolder+'movie.mov'):
-        nofile=True
-    
-    if arguments['-o']:
-        if not os.path.isfile(arguments['-o']):
-            nofile=True
-
-    if nofile:
-        qscale=' '
-        if arguments['-o']:
-            os.chdir(workingfolder)
-            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+arguments['-o'],shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-        else:
-            os.chdir(workingfolder)
-            subprocess.call('ffmpeg -r '+fps+qscale+'-y -an -i ' + 'moviepar%05d.png '+'movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-
-    #remove png
-    if os.path.isfile(workingfolder+'movie.mov') or os.path.isfile(arguments['-o']):
-        ifiles=sorted(glob.glob(workingfolder+ 'moviepar*.png' ))
-        assert(ifiles!=[]),"glob didn't find any symlinks to remove anything!"
-        for f in ifiles:
-            os.remove(f)
-
-        if os.path.isfile(workingfolder+'movie.mov'):
-            lg.info("MkMov SUCCESS, check it out: "+workingfolder+'movie.mov')
-
-        if arguments['-o']:
-            if os.path.isfile(arguments['-o']):
-                lg.info("MkMov SUCCESS, check it out: "+arguments['-o'])
-    else:
-        lg.info("MkMov FAIL")
-        lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
-        sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+    call_ffmpeg(workingfolder)
 
 if __name__ == "__main__": 
     LogStart('',fout=False)
