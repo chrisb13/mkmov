@@ -46,8 +46,8 @@ Options:
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
-    --cmap PLTCMAP              : matplotlib color map to contourf with
-    --clev LEVELS               : number of colour levels to have on the contour map (default is 50). See [1] for options.
+    --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
+    --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
 Example tests (should work 'out of the box'):
