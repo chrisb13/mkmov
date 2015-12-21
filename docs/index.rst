@@ -8,9 +8,11 @@ MkMov documentation!
 
 .. image:: https://raw.githubusercontent.com/chrisb13/mkmov/master/img/mkmovlogo001.png
 
-This utility is designed to make a movie from a NetCDF file or stitch together a series of *.png files. Interface is by command line and everything is done in one line! All code is on `GitHub`_, pull requests welcome!
+This utility is designed to make a movie from a NetCDF file or stitch together a series of *.png files. Interface is by command line and everything is done in one line! All code is on `GitHub`_, `pull requests`_ welcome!
 
 .. _Github: https://github.com/chrisb13/mkmov
+
+.. _pull requests: https://help.github.com/articles/creating-a-pull-request/
 
 Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)
 
