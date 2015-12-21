@@ -43,6 +43,15 @@ There are more working examples in run_mkmov_examples.sh (in the root of the rep
 
 .. _testing: https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml
 
+Head over to the `examples`_ section to see some output and example commands:
+.. _examples: http://christopherbull.com.au/mkmov/examples.html
+
+--------------------
+Usage comments
+--------------------
+
+* Mkmov will start faster and require much less memory resources if the --min MINIMUM and --max MAXIMUM arguments are used, see advanced usage below. Particularly important when passing multiple files.
+
 --------------------
 More advanced usage
 --------------------
@@ -76,8 +85,8 @@ Details to this section are ongoing as optional arguments are added.
         -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
         --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
         --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
-        --cmap PLTCMAP              : matplotlib color map to contourf with
-        --clev LEVELS               : number of colour levels to have on the contour map (default is 30). See [1] for options.
+        --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
+        --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
         --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
     Example tests (should work 'out of the box'):
@@ -85,11 +94,11 @@ Details to this section are ongoing as optional arguments are added.
     python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
     python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
     python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
     python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
     python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
     python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
     python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
     References:
-        [1]  http://matplotlib.org/examples/color/colormaps_reference.html
+        [1] http://matplotlib.org/examples/color/colormaps_reference.html

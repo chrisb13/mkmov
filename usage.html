@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="MkMov 0.1 documentation" href="index.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="next" title="Youtube Examples" href="examples.html" />
     <link rel="prev" title="Installation" href="installation.html" />
    
   
@@ -39,7 +39,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="examples.html" title="Examples"
+          <a href="examples.html" title="Youtube Examples"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Installation"
@@ -82,6 +82,14 @@ python mkmov.py --stitch *.png FILE_NAMES
 <p>Here&#8217;s a full example:</p>
 <script type="text/javascript" src="https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.js" id="asciicast-7etd14t6r4wqsccipcduhcrgo" async></script><p>Note: you can pause the script and copy the code!</p>
 <p>There are more working examples in run_mkmov_examples.sh (in the root of the repository). A netCDF file and some example png files are included in the examples folder, so these examples should work &#8216;out of the box&#8217;. Indeed, these same examples form our <a class="reference external" href="https://raw.githubusercontent.com/chrisb13/mkmov/master/.travis.yml">testing</a> suite!</p>
+<p>Head over to the <a href="#id3"><span class="problematic" id="id4">`examples`_</span></a> section to see some output and example commands:
+.. _examples: <a class="reference external" href="http://christopherbull.com.au/mkmov/examples.html">http://christopherbull.com.au/mkmov/examples.html</a></p>
+</div>
+<div class="section" id="usage-comments">
+<h2>Usage comments<a class="headerlink" href="#usage-comments" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Mkmov will start faster and require much less memory resources if the &#8211;min MINIMUM and &#8211;max MAXIMUM arguments are used, see advanced usage below. Particularly important when passing multiple files.</li>
+</ul>
 </div>
 <div class="section" id="more-advanced-usage">
 <h2>More advanced usage<a class="headerlink" href="#more-advanced-usage" title="Permalink to this headline">¶</a></h2>
@@ -113,8 +121,8 @@ Options:
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
-    --cmap PLTCMAP              : matplotlib color map to contourf with
-    --clev LEVELS               : number of colour levels to have on the contour map (default is 30). See [1] for options.
+    --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
+    --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
 Example tests (should work &#39;out of the box&#39;):
@@ -122,14 +130,14 @@ python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
 References:
-    [1]  http://matplotlib.org/examples/color/colormaps_reference.html
+    [1] http://matplotlib.org/examples/color/colormaps_reference.html
 </pre></div>
 </div>
 </div>
@@ -145,6 +153,7 @@ References:
   <ul>
 <li><a class="reference internal" href="#">Usage</a><ul>
 <li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li><a class="reference internal" href="#usage-comments">Usage comments</a></li>
 <li><a class="reference internal" href="#more-advanced-usage">More advanced usage</a></li>
 </ul>
 </li>
@@ -155,7 +164,7 @@ References:
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="examples.html"
-                        title="next chapter">Examples</a></p>
+                        title="next chapter">Youtube Examples</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
