@@ -29,9 +29,9 @@ import shlex
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-
+#CB found out about this hack for readthedocs from http://pyprotem.readthedocs.org/en/latest/read_the_docs/
 sys.path.append(".")  # Needed to find fulltoc
-extensions = ['sphinxcontrib.fulltoc']
+extensions = ['fulltoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
