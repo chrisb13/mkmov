@@ -18,7 +18,7 @@ This utility is designed to make a movie from a NetCDF file or stitch together a
 
 .. _pull requests: https://help.github.com/articles/creating-a-pull-request/
 
-MkMov's utility is best shown by example, here is AVISO global allsat madt, output is daily and variable is adt.
+MkMov's utility is best shown by an example, here is AVISO global allsat madt, output is daily and variable is adt.
 
 .. raw:: html
     
@@ -28,21 +28,25 @@ This movie was created with a single line command, namely
 ::
     python mkmov.py adt --lmask -214748 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Set3.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/15.log &
 
-Check out these other  `examples`_.
+More examples with their respective run command `here`_.
 
-.. _examples: http://christopherbull.com.au/mkmov/examples.html
+.. _here: http://christopherbull.com.au/mkmov/examples.html
 
 ---------------------------------
 Getting started quickly...
 ---------------------------------
 
-Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)
+Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to `usage`_ or check out this video. Note: video can be paused and you can copy and paste code!
+
+.. _usage: http://christopherbull.com.au/mkmov/usage.html
 
 .. raw:: html
 
     <script type="text/javascript" src="https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.js" id="asciicast-7etd14t6r4wqsccipcduhcrgo" async></script>
 
-Need to install some python packages or ffmpeg? Have a look at the installation section...
+Need to install some python packages or ffmpeg? Have a look at the `installation section`_.
+
+.. _installation section: http://christopherbull.com.au/mkmov/installation.html
 
 Contents:
 
