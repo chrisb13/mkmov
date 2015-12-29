@@ -8,11 +8,33 @@ MkMov documentation!
 
 .. image:: https://raw.githubusercontent.com/chrisb13/mkmov/master/img/mkmovlogo001.png
 
+---------------------------------
+What does it do?
+---------------------------------
+
 This utility is designed to make a movie from a NetCDF file or stitch together a series of *.png files. Interface is by command line and everything is done in one line! All code is on `GitHub`_, `pull requests`_ welcome!
 
 .. _Github: https://github.com/chrisb13/mkmov
 
 .. _pull requests: https://help.github.com/articles/creating-a-pull-request/
+
+MkMov's utility is best shown by example, here is AVISO global allsat madt, output is daily and variable is adt.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtube.com/embed/JEMj05o-KA4" frameborder="0" allowfullscreen></iframe>
+
+This movie was created with a single line command, namely
+::
+    python mkmov.py adt --lmask -214748 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Set3.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/15.log &
+
+Check out these other  `examples`_.
+
+.. _examples: http://christopherbull.com.au/mkmov/examples.html
+
+---------------------------------
+Getting started quickly...
+---------------------------------
 
 Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)
 
