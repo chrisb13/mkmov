@@ -3,7 +3,7 @@
 Youtube Examples
 ############
 
-Here are some videos that are made by MkMov. If you've got an awesome video of netCDF output you've made with MkMov, please get in touch and we'll add it to the site! If you do sent in a video, please also send the command you used to make it and a caption, describing  what you've plotted.
+Here are some videos that are made by MkMov. If you've got an awesome video of netCDF output you've made with MkMov, get in touch and we'll add it to the site! If you do sent in a video, please also send the command you used to make it and a caption, describing  what you've plotted.
 
 ------------------------------------
 1_TROPAC01-TRC001_5d_sossheig_Dark2
@@ -16,3 +16,193 @@ Here are some videos that are made by MkMov. If you've got an awesome video of n
 Video was made with....
 ::
     python mkmov.py sossheig --lmask 0 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_TROPAC01-TRC001_5d_sossheig_Dark2.mov /srv/ccrc/data42/z3457920/RawData/NEMO/TROPAC01-TRC001/perday/1_TROPAC01-TRC001_5d_*T.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/4a.log &
+
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D zos
+--------------------------------------------
+NEMO 0.25 degree CORDEX, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/tbzIl54c2Ys" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos --min -1 --max 1 --lmask 0  -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_zos.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/7.log &
+  
+--------------------------------------------
+AVISOdt global allsat madt
+--------------------------------------------
+AVISO global allsat madt, output is daily and variable is adt.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/Ai2bW3ID2tU" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py adt --lmask -214748 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/14.log &
+  
+--------------------------------------------
+1 cordex24 AGRIF ERAI09 1d grid T 2D zos
+--------------------------------------------
+NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/DNgha-PJnYM" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos --min -1 --max 1 --lmask 0 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_cordex24_AGRIF-ERAI09_1d_grid_T_2D_zos.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_AGRIF_ERAI09/*/1_cordex24_AGRIF-ERAI09_1d_*grid_T_2D.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/13.log &
+  
+--------------------------------------------
+AVISOdt global allsat madt Set3
+--------------------------------------------
+AVISO global allsat madt, output is daily and variable is adt.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/JEMj05o-KA4" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py adt --lmask -214748 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Set3.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/15.log &
+  
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D zos Set3
+--------------------------------------------
+NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/zjAF1Uig0rI" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos --min -1 --max 1 --lmask 0 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_zos_Set3.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/5.log &
+  
+--------------------------------------------
+AVISOdt global allsat madt Dark2
+--------------------------------------------
+AVISO global allsat madt, output is daily and variable is adt.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/MGmun26XrDg" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py adt --lmask -214748 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Dark2.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/16.log &
+  
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D zos Dark2
+--------------------------------------------
+NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/hyMENGrVUUM" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos --min -1 --max 1 --lmask 0 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_zos_Dark2.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/6.log &
+
+  
+--------------------------------------------
+1 cordex24 AGRIF ERAI09 1d grid T 2D zos Set3
+--------------------------------------------
+NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/cxUNvOdoZTY" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos --min -1 --max 1 --lmask 0 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_cordex24_AGRIF-ERAI09_1d_grid_T_2D_zos_Set3.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_AGRIF_ERAI09/*/1_cordex24_AGRIF-ERAI09_1d_*grid_T_2D.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/12.log &
+  
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D tos
+--------------------------------------------
+NEMO 0.25 degree CORDEX domain with daily output, variable is temperature.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/lmFzKkF-GDo" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py tos --lmask 0  -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_tos.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/8.log &
+
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D tos Set3
+--------------------------------------------
+NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/VqpElu3tMqQ" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py tos --lmask 0 --cmap Set3  -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_tos_Set3.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/9.log &
+  
+-----------------------------------------------
+1 cordex24 AGRIF ERAI09 1d grid T 2D zos Dark2
+-----------------------------------------------
+NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/g5ZHcE35kHk" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py zos  --min -1 --max 1 --lmask 0 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_cordex24_AGRIF-ERAI09_1d_grid_T_2D_zos_Dark2.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_AGRIF_ERAI09/*/1_cordex24_AGRIF-ERAI09_1d_*grid_T_2D.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/11.log &
+  
+--------------------------------------------
+1 TROPAC01 TRC001 5d sossheig Paired
+--------------------------------------------
+NEMO 0.10 degree with deaily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/gWwbvX5yC8U" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py sossheig --lmask 0 --cmap Paired -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_TROPAC01-TRC001_5d_sossheig_Paired.mov /srv/ccrc/data42/z3457920/RawData/NEMO/TROPAC01-TRC001/perday/1_TROPAC01-TRC001_5d_*T.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/4a.log &
+  
+--------------------------------------------
+1 TROPAC01 TRC001 5d sossheig Set3
+--------------------------------------------
+NEMO 0.10 degree with deaily output, variable is sea surface height.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/SL8rtyvU2ZY" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py sossheig --lmask 0 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_TROPAC01-TRC001_5d_sossheig_Set3.mov /srv/ccrc/data42/z3457920/RawData/NEMO/TROPAC01-TRC001/perday/1_TROPAC01-TRC001_5d_*T.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/4.log &
+  
+--------------------------------------------
+cordex24 ERAI01 1d grid T 2D tos Dark2
+--------------------------------------------
+NEMO 0.25 degree CORDEX domain with daily output, variable is temperature.
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://youtu.be/2hKAN4wh51k" frameborder="0" allowfullscreen></iframe>
+
+Single line command this video was made with:
+::
+    python mkmov.py tos --lmask 0 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/cordex24-ERAI01_1d_grid_T_2D_tos_Dark2.mov /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/*/cordex24-ERAI01_1d_*_grid_T_2D.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/10.log &
+
+--------------------------------------------
+Acknowledgements
+--------------------------------------------
+The altimeter products were produced by Ssalto/Duacs and distributed by Aviso with support from Cnes.
+
+TROPAC01 was developed within the framework of the DFG project SFB754 and integrated at the North-German Supercomputing Alliance (HLRN).
