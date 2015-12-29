@@ -52,7 +52,18 @@
   <div class="section" id="mkmov-documentation">
 <h1>MkMov documentation!<a class="headerlink" href="#mkmov-documentation" title="Permalink to this headline">¶</a></h1>
 <img alt="https://raw.githubusercontent.com/chrisb13/mkmov/master/img/mkmovlogo001.png" src="https://raw.githubusercontent.com/chrisb13/mkmov/master/img/mkmovlogo001.png" />
+<div class="section" id="what-does-it-do">
+<h2>What does it do?<a class="headerlink" href="#what-does-it-do" title="Permalink to this headline">¶</a></h2>
 <p>This utility is designed to make a movie from a NetCDF file or stitch together a series of <a href="#id1"><span class="problematic" id="id2">*</span></a>.png files. Interface is by command line and everything is done in one line! All code is on <a class="reference external" href="https://github.com/chrisb13/mkmov">GitHub</a>, <a class="reference external" href="https://help.github.com/articles/creating-a-pull-request/">pull requests</a> welcome!</p>
+<p>MkMov&#8217;s utility is best shown by example, here is AVISO global allsat madt, output is daily and variable is adt.</p>
+<iframe width="480" height="385" src="https://youtube.com/embed/JEMj05o-KA4" frameborder="0" allowfullscreen></iframe><p>This movie was created with a single line command, namely</p>
+<div class="highlight-python"><div class="highlight"><pre>python mkmov.py adt --lmask -214748 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Set3.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &amp;&gt;  /srv/ccrc/data42/z3457920/mkmovmovies4/15.log &amp;
+</pre></div>
+</div>
+<p>Check out these other  <a class="reference external" href="http://christopherbull.com.au/mkmov/examples.html">examples</a>.</p>
+</div>
+<div class="section" id="getting-started-quickly">
+<h2>Getting started quickly...<a class="headerlink" href="#getting-started-quickly" title="Permalink to this headline">¶</a></h2>
 <p>Already have matplotlib, numpy, netCDF4 and ffmpeg? Jump straight to usage or check out this video... (note: video can be paused and you can copy and paste code!)</p>
 <script type="text/javascript" src="https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.js" id="asciicast-7etd14t6r4wqsccipcduhcrgo" async></script><p>Need to install some python packages or ffmpeg? Have a look at the installation section...</p>
 <p>Contents:</p>
@@ -92,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="all-about-me.html">All about me</a></li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">

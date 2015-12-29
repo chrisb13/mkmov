@@ -24,7 +24,7 @@ NEMO 0.25 degree CORDEX, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/tbzIl54c2Ys" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/tbzIl54c2Ys" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -37,7 +37,7 @@ AVISO global allsat madt, output is daily and variable is adt.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/Ai2bW3ID2tU" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/Ai2bW3ID2tU" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -50,7 +50,7 @@ NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/DNgha-PJnYM" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/DNgha-PJnYM" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -63,7 +63,7 @@ AVISO global allsat madt, output is daily and variable is adt.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/JEMj05o-KA4" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/JEMj05o-KA4" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -76,7 +76,7 @@ NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/zjAF1Uig0rI" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/zjAF1Uig0rI" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -89,7 +89,7 @@ AVISO global allsat madt, output is daily and variable is adt.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/MGmun26XrDg" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/MGmun26XrDg" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -102,7 +102,7 @@ NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/hyMENGrVUUM" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/hyMENGrVUUM" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -116,7 +116,7 @@ NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/cxUNvOdoZTY" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/cxUNvOdoZTY" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -129,7 +129,7 @@ NEMO 0.25 degree CORDEX domain with daily output, variable is temperature.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/lmFzKkF-GDo" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/lmFzKkF-GDo" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -142,7 +142,7 @@ NEMO 0.25 degree CORDEX domain with daily output, variable is sea surface height
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/VqpElu3tMqQ" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/VqpElu3tMqQ" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -155,7 +155,7 @@ NEMO AGRIF 0.08 degree with daily output, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/g5ZHcE35kHk" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/g5ZHcE35kHk" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -168,7 +168,7 @@ NEMO 0.10 degree with deaily output, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/gWwbvX5yC8U" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/gWwbvX5yC8U" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -181,7 +181,7 @@ NEMO 0.10 degree with deaily output, variable is sea surface height.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/SL8rtyvU2ZY" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/SL8rtyvU2ZY" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
@@ -194,7 +194,7 @@ NEMO 0.25 degree CORDEX domain with daily output, variable is temperature.
 
 .. raw:: html
     
-    <iframe width="480" height="385" src="https://youtu.be/2hKAN4wh51k" frameborder="0" allowfullscreen></iframe>
+    <iframe width="480" height="385" src="https://youtube.com/embed/2hKAN4wh51k" frameborder="0" allowfullscreen></iframe>
 
 Single line command this video was made with:
 ::
