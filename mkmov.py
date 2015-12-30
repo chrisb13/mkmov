@@ -28,7 +28,7 @@ Interface is by command line. Fully working examples can be found in: run_mkmov_
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS] VARIABLE_NAME FILE_NAME...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL] VARIABLE_NAME FILE_NAME...
     mkmov.py --stitch [-o OUTPATH --fps FRATE] FILE_NAMES...
 
 Arguments:
@@ -48,6 +48,7 @@ Options:
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
     --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
     --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
+    --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
 Example tests (should work 'out of the box'):
@@ -174,6 +175,10 @@ def dispay_passed_args(workingfolder):
         if arguments['--clev']:
             lg.info("You have said you would like to contourf with the following number of levels: " + \
                     str(int(arguments['--clev'])))
+
+        if arguments['--4dvar']:
+            lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
+                    str(int(arguments['--4dvar'])))
 
         lg.info("-----------------------------------------------------------------")
     elif arguments['FILE_NAMES']!=[]:
@@ -306,6 +311,28 @@ class MovMaker(object):
                 lg.error("Variable: " + str(self.variable_name) + " does not exist in netcdf4 file.")
                 sys.exit("Variable: " + str(self.variable_name) + " does not exist in netcdf4 file.")
 
+            #what shape is the passed variable? Do some error checks
+            self.var_len=len(ifile.variables[self.variable_name].shape)
+            if self.var_len==2:
+                if len(arguments['FILE_NAMES'])==1:
+                    #h'm haven't actually tried this! 
+                    lg.error("Variable: " + str(self.variable_name) + " has only two dimensions and you only fed mkmov one file so I don't know where your time dimension is.")
+                elif len(arguments['FILE_NAMES'])>1: #have tested this on AVISO works okay
+                    pass
+                    
+            #the 'obvious' case; one file with one time dim and two spatial dims
+            if self.var_len==3: 
+                pass
+
+            #tricky, which dims are time/random_dim/spatial1/spatial2?
+            if self.var_len==4:
+                if arguments['--4dvar']:
+                    lg.debug("Variable: " + str(self.variable_name) + " has four dimensions. Following your argument, we will plot depth level: "+arguments['--4dvar'] )
+                    self.depthlvl=int(arguments['--4dvar'])
+                else:
+                    lg.warning("Variable: " + str(self.variable_name) + " has four dimensions. MkMov will assume the second dim is depth/height and plot the first level.")
+                    self.depthlvl=0
+
             #find unlimited dimension
             findunlim=[ifile.dimensions[dim].isunlimited() for dim in ifile.dimensions.keys()]
             dim_unlim_num=[i for i, x in enumerate(findunlim) if x]
@@ -327,6 +354,8 @@ class MovMaker(object):
                 timename='time'
             elif 't' in ifile.dimensions.keys():
                 timename='t'
+            elif 'Time' in ifile.dimensions.keys():
+                timename='Time'
             else:
                 timename=''
 
@@ -351,14 +380,26 @@ class MovMaker(object):
         :workingfolder: @todo
         :returns: @todo
         """
+        def getdata():
+            """function that grabs the data
+            :returns: nparray
+            """
+            if self.var_len==4:
+                var_nparray=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
+            else:
+                var_nparray=ifile.variables[self.variable_name][:]
+        
+            return var_nparray
+
         lg.info("Camera! Creating your plots...")
+
         #get max and min values for timeseries. This is expensive :(
         if (minvar is None) and (maxvar is None):
             mins=[]
             maxs=[]
             for f in self.filelist:
                 ifile=Dataset(f, 'r')
-                name_of_array=ifile.variables[self.variable_name][:]
+                name_of_array=getdata()
 
                 mins.append(np.min(name_of_array))
                 maxs.append(np.max(name_of_array))
@@ -375,15 +416,22 @@ class MovMaker(object):
         framecnt=1
         for f in self.filelist:
             ifile=Dataset(f, 'r')
-            name_of_array=ifile.variables[self.variable_name][:]
+            name_of_array=getdata()
 
             plt.close('all')
             fig=plt.figure()
 
-            x,y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),np.arange(np.shape(name_of_array)[self.timedim+1]))
+            x,y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),\
+                    np.arange(np.shape(name_of_array)[self.timedim+1]))
 
             minvar=np.min(name_of_array)
             maxvar=np.max(name_of_array)
+
+            #h'm the following loop has a problem, because if tstep isn't in dim 0 we are screwed! (probably needs some fancy syntax to slice out of name_of_array (hard without google)
+            if self.timedim!=0:
+                lg.error("Your time dimension wasn't in the first dimension, MkMov doesn't know what to do with this kind of file.")
+                sys.exit("Your time dimension wasn't in the first dimension, MkMov doesn't know what to do with this kind of file.")
+
             for tstep in np.arange(np.shape(name_of_array)[self.timedim]):
                 lg.debug("Working timestep: " + str(framecnt)+ " frames in: " +self.workingfolder)
 
