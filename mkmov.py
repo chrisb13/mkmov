@@ -28,7 +28,7 @@ Interface is by command line. Fully working examples can be found in: run_mkmov_
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL] VARIABLE_NAME FILE_NAME...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT] VARIABLE_NAME FILE_NAME...
     mkmov.py --stitch [-o OUTPATH --fps FRATE] FILE_NAMES...
 
 Arguments:
@@ -49,6 +49,8 @@ Options:
     --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
     --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
     --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
+    --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
+    --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
 
 Example tests (should work 'out of the box'):
@@ -59,6 +61,7 @@ python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
@@ -155,6 +158,14 @@ def dispay_passed_args(workingfolder):
         if (arguments['--min'] is not None) and (arguments['--max'] is not None):
             lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
 
+        #error check to make sure both min and max were passed
+        if (arguments['--min'] is not None) and (arguments['--max'] is None):
+            lg.error("You passed min but not max")
+            sys.exit("You passed min but not max")
+        elif(arguments['--min'] is None) and (arguments['--max'] is not None): 
+            lg.error("You passed max but not min")
+            sys.exit("You passed max but not min")
+
         if arguments['--preview']:
             lg.info("You have opted to preview your plot before making a movie.")
 
@@ -179,6 +190,17 @@ def dispay_passed_args(workingfolder):
         if arguments['--4dvar']:
             lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
                     str(int(arguments['--4dvar'])))
+
+        if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
+            lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
+
+        #error check to make sure both figwith and fighgt were passed
+        if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is None):
+            lg.error("You passed figwth but not fighgt")
+            sys.exit("You passed figwth but not fighgt")
+        elif(arguments['--figwth'] is None) and (arguments['--fighgt'] is not None): 
+            lg.error("You passed fighgt but not figwth")
+            sys.exit("You passed fighgt but not figwth")
 
         lg.info("-----------------------------------------------------------------")
     elif arguments['FILE_NAMES']!=[]:
@@ -419,7 +441,12 @@ class MovMaker(object):
             name_of_array=getdata()
 
             plt.close('all')
-            fig=plt.figure()
+
+            if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
+                #width then height
+                fig=plt.figure(figsize=(float(arguments['--figwth']),float(arguments['--fighgt'])))
+            else:
+                fig=plt.figure()
 
             x,y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),\
                     np.arange(np.shape(name_of_array)[self.timedim+1]))
@@ -552,7 +579,7 @@ if __name__ == "__main__":
     check_dependencies()
 
     #We are in making movie mode...
-    #main.py [--min MINIMUM --max MAXIMUM --preview] VARIABLE_NAME FILE_NAME...
+    #main.py [OPTIONS] VARIABLE_NAME FILE_NAME...
     if arguments['FILE_NAME']!=[]:
         from netCDF4 import Dataset
         if not arguments['--preview']:
