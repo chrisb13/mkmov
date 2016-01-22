@@ -20,7 +20,7 @@
 
 """
 MkMov v0.3
-This is a python script for making movies. In can be used in two ways:
+This is a python package for making movies. In can be used in two ways:
     1] from a netCDF file
     2] from a list of png files (use --stitch option)
 
