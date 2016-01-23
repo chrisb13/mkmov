@@ -55,9 +55,8 @@ script:
   - python mkmov.py --stitch -o $(pwd)/stitchmov2.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
 #download more examples
-#  - chmod u+x git-lfs_install4travis.sh
-#  - git-lfs_install4travis.sh
   - git clone https://github.com/chrisb13/mkmovexamples.git $(pwd)/mkmovexamples
   
   - python mkmov.py adt --lmask -214748 --cmap Set3 -o $(pwd)/AVISOdt_global_allsat_madt_Set3.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
-  
+  - python mkmov.py PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
+  - python mkmov.py PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
