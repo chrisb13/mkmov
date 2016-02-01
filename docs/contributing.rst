@@ -12,7 +12,6 @@ Features that would be awesome:
 
 #. 3d plots/quiver plots/multiple variables etc.
 #. basemap integration
-#. python 3 support
 #. installation with Anaconda
 #. subplots
 #. speed/memory optimisation 
