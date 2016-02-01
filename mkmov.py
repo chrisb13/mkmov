@@ -355,8 +355,10 @@ class MovMaker(object):
                     lg.warning("Variable: " + str(self.variable_name) + " has four dimensions. MkMov will assume the second dim is depth/height and plot the first level.")
                     self.depthlvl=0
 
+            ifile_dim_keys=list(dict(ifile.dimensions).keys())
+
             #find unlimited dimension
-            findunlim=[ifile.dimensions[dim].isunlimited() for dim in ifile.dimensions.keys()]
+            findunlim=[ifile.dimensions[dim].isunlimited() for dim in ifile_dim_keys]
             dim_unlim_num=[i for i, x in enumerate(findunlim) if x]
             if len(dim_unlim_num)==0:
                 lg.warning("Input file: " + str(os.path.basename(f))  + " has no unlimited dimension, which dim is time?")
@@ -365,18 +367,18 @@ class MovMaker(object):
                 lg.warning("Input file: " + str(os.path.basename(f))  + " has more than one unlimited dimension.")
                 # sys.exit("Input file: " + str(os.path.basename(f))  + " has more than one unlimited dimension.")
             else:
-                timename=ifile.dimensions.keys()[dim_unlim_num[0]]
+                timename=ifile_dim_keys[dim_unlim_num[0]]
                 var_timedim=[i for i, x in enumerate(ifile.variables[self.variable_name].dimensions) if x==timename][0]
                 var_timedims.append(var_timedim)
                 ifile.close()
                 continue #NOTE I'm a continue!
 
             #okay so we didn't find time as an unlimited dimension, perhaps it has a sensible name?
-            if 'time' in ifile.dimensions.keys():
+            if 'time' in ifile_dim_keys:
                 timename='time'
-            elif 't' in ifile.dimensions.keys():
+            elif 't' in ifile_dim_keys:
                 timename='t'
-            elif 'Time' in ifile.dimensions.keys():
+            elif 'Time' in ifile_dim_keys:
                 timename='Time'
             else:
                 timename=''
