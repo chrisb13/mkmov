@@ -61,5 +61,6 @@ script:
   - git clone https://github.com/chrisb13/mkmovexamples.git $(pwd)/mkmovexamples
   
   - python mkmov.py adt --lmask -214748 --cmap Set3 -o $(pwd)/AVISOdt_global_allsat_madt_Set3.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
+  - python mkmov.py adt --lmask -214748 --x lon --y lat --cmap Accent -o $(pwd)/AVISOdt_global_allsat_madt_Accent.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
   - python mkmov.py PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
   - python mkmov.py PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
