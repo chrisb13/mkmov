@@ -17,6 +17,56 @@ Video was made with....
 ::
     python mkmov.py sossheig --lmask 0 --cmap Dark2 -o /srv/ccrc/data42/z3457920/mkmovmovies4/1_TROPAC01-TRC001_5d_sossheig_Dark2.mov /srv/ccrc/data42/z3457920/RawData/NEMO/TROPAC01-TRC001/perday/1_TROPAC01-TRC001_5d_*T.nc &> /srv/ccrc/data42/z3457920/mkmovmovies4/4a.log &
 
+
+------------------------------------
+ORCA025.L75-MJM95-S Accent 
+------------------------------------
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/m_fUF21dYd0" frameborder="0" allowfullscreen></iframe>
+
+Video was made with....
+::
+    python mkmov.py  sossheig --cmap Accent --lmask 0 --min -2.2 --max 1.5 -o /srv/ccrc/data42/z3457920/mkmovmovies4/orca025_Accent.mov /srv/ccrc/data22/z3381502/ORCA025.L75-MJM95-S/*_gridT.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/19.log &
+
+------------------------------------
+ORCA025.L75-MJM95-S Dark2
+------------------------------------
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/MoC3sUUflko" frameborder="0" allowfullscreen></iframe>
+
+    
+Video was made with....
+::
+    python mkmov.py  sossheig --cmap Dark2 --lmask 0 --min -2.2 --max 1.5 -o /srv/ccrc/data42/z3457920/mkmovmovies4/orca025_Dark2.mov /srv/ccrc/data22/z3381502/ORCA025.L75-MJM95-S/*_gridT.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/18.log &
+
+------------------------------------
+ORCA025.L75-MJM95-S Set3
+------------------------------------
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/-sNs6zReikk" frameborder="0" allowfullscreen></iframe>
+    
+Video was made with....
+::
+    python mkmov.py  sossheig --cmap Set3 --lmask 0 --min -2.2 --max 1.5 -o /srv/ccrc/data42/z3457920/mkmovmovies4/orca025_Set3.mov /srv/ccrc/data22/z3381502/ORCA025.L75-MJM95-S/*_gridT.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/17.log &
+
+--------------------------------------------
+MOM6
+--------------------------------------------
+
+.. raw:: html
+    
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/h5UHYOtzci8" frameborder="0" allowfullscreen></iframe>
+    
+Video was made with....
+::
+    python mkmov.py PV --fps 10 --fighgt 2.5 --figwth 14  -o  /home/chris/mount_win/mom6/outs/newdim.mov /home/chris/mount_win/mom6/ave_prog__*.nc
+
 --------------------------------------------
 cordex24 ERAI01 1d grid T 2D zos
 --------------------------------------------

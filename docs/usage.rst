@@ -52,6 +52,7 @@ Usage comments
 --------------------
 
 * Mkmov will start faster and require much less memory resources if the --min MINIMUM and --max MAXIMUM arguments are used, see advanced usage below. Particularly important when passing multiple files.
+* Mkmov expects full paths not relative paths
 
 --------------------
 More advanced usage
@@ -91,7 +92,19 @@ Details to this section are ongoing as optional arguments are added.
         --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
         --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
         --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
-        --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
+        --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
+
+    Example tests (should work 'out of the box'):
+    python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+    python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
+    python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 
     References:
         [1] http://matplotlib.org/examples/color/colormaps_reference.html
