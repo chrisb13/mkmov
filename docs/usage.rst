@@ -69,7 +69,7 @@ Details to this section are ongoing as optional arguments are added.
 
     Usage:
         mkmov.py -h
-        mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --killsplash] VARIABLE_NAME FILE_NAME...
+        mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
         mkmov.py --stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
 
     Arguments:
@@ -79,10 +79,8 @@ Details to this section are ongoing as optional arguments are added.
 
     Options:
         -h,--help                   : show this help message
-        --min MINIMUM               : the minimum value for the contour map 
-                                        (nb: if you select a min, you must select a max.)
-        --max MAXIMUM               : the maximum value for the contour map
-                                        (nb: if you select a max, you must select a min.)
+        --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
+        --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
         --preview                   : show a preview of the plot (will exit afterwards).
         -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
         --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
@@ -92,6 +90,8 @@ Details to this section are ongoing as optional arguments are added.
         --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
         --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
         --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
+        --x XVARIABLE               : variable to plot on the x-axis (nb: if you specify a xvariable, you must select a yvariable.)
+        --y YVARIABLE               : variable to plot on the y-axis (nb: if you specify a yvariable, you must select a xvariable.)
         --killsplash                : do not display splash screen advertisement for MkMov at end of movie
         --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
 
