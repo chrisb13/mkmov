@@ -51,7 +51,7 @@ Options:
     --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
     --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
-    --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions)
+    --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
 
 Example tests (should work 'out of the box'):
 python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
