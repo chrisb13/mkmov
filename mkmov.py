@@ -28,8 +28,8 @@ Interface is by command line. Fully working examples can be found in: run_mkmov_
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT] VARIABLE_NAME FILE_NAME...
-    mkmov.py --stitch [-o OUTPATH --fps FRATE] FILE_NAMES...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py --stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -51,6 +51,7 @@ Options:
     --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
     --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
+    --killsplash                : do not display splash screen advertisement for MkMov at end of movie
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
 
 Example tests (should work 'out of the box'):
@@ -62,8 +63,10 @@ python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 --killsplash zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
+python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
 
 References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
@@ -193,6 +196,9 @@ def dispay_passed_args(workingfolder):
 
         if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
             lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
+
+        if arguments['--killsplash']:
+            lg.info("You have asked for the MkMov splash screen to NOT be displayed at the end of your movie.")
 
         #error check to make sure both figwith and fighgt were passed
         if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is None):
@@ -508,21 +514,22 @@ class MovMaker(object):
 
             ifile.close()
 
-        #attemp at adding logo at end.
-        logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
-        #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
-        nologo=False
-        for more in range(20):
-            try:
-                os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
-            except OSError:
-                nologo=True
-                break
-            framecnt+=1
+        if not arguments['--killsplash']:
+            #attemp at adding logo at end.
+            logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
+            #logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmovlogo001_resize.png'
+            nologo=False
+            for more in range(20):
+                try:
+                    os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+                except OSError:
+                    nologo=True
+                    break
+                framecnt+=1
 
-        if nologo:
-            #on some file systems, like some network shares,  we can't make symlinks ..
-            lg.warning("Couldn't insert the logo at the end, sorry!")
+            if nologo:
+                #on some file systems, like some network shares,  we can't make symlinks ..
+                lg.warning("Couldn't insert the logo at the end, sorry!")
 
 
     def action(self):
@@ -546,20 +553,21 @@ def stitch_action(workingfolder):
 
         framecnt+=1
 
-    #adding logo at end.
-    logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
-    nologo=False
-    for more in range(20):
-        try:
-            os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
-        except OSError:
-            nologo=True
-            break
-        framecnt+=1
+    if not arguments['--killsplash']:
+        #adding logo at end.
+        logo=os.path.dirname(os.path.realpath(__file__))+'/img/'+'mkmov_logo001_splash.png'
+        nologo=False
+        for more in range(20):
+            try:
+                os.symlink(logo,workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+            except OSError:
+                nologo=True
+                break
+            framecnt+=1
 
-    if nologo:
-        #on some file systems, like some network shares,  we can't make symlinks ..
-        lg.warning("Couldn't insert the logo at the end, sorry!")
+        if nologo:
+            #on some file systems, like some network shares,  we can't make symlinks ..
+            lg.warning("Couldn't insert the logo at the end, sorry!")
 
     call_ffmpeg(workingfolder)
 
