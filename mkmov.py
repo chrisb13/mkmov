@@ -28,7 +28,7 @@ Interface is by command line. Fully working examples can be found in: run_mkmov_
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
     mkmov.py --stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
 
 Arguments:
@@ -41,6 +41,8 @@ Options:
     --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
     --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
     --preview                   : show a preview of the plot (will exit afterwards).
+    --bias TIMENAME             : create a movie with bias from the mean (this requires NCO tools to be installed). Need to pass the name of the time dimension so we can use NCO tools.
+    --bcmapcentre               : bias movie with centre around zero (need to also specify --cmap AND --bias)
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
@@ -82,6 +84,13 @@ import subprocess
 
 import glob
 
+#for cmap_center_point_adjust function
+import math
+import copy
+from matplotlib import colors
+import matplotlib
+
+
 def mkdir(p):
     """make directory of path that is passed"""
     try:
@@ -92,6 +101,48 @@ def mkdir(p):
        if exc.errno == errno.EEXIST and os.path.isdir(p):
           pass
        else: raise
+
+def cmap_center_point_adjust(cmap, range, center):
+    '''
+    converts center to a ratio between 0 and 1 of the
+    range given and calls cmap_center_adjust(). returns
+    a new adjusted colormap accordingly
+
+    NB: nicked from https://sites.google.com/site/theodoregoetz/notes/matplotlib_colormapadjust
+    '''
+    def cmap_center_adjust(cmap, center_ratio):
+        '''
+        returns a new colormap based on the one given
+        but adjusted so that the old center point higher
+        (>0.5) or lower (<0.5)
+        '''
+        if not (0. < center_ratio) & (center_ratio < 1.):
+            return cmap
+        a = math.log(center_ratio) / math.log(0.5)
+        return cmap_powerlaw_adjust(cmap, a)
+
+    def cmap_powerlaw_adjust(cmap, a):
+        '''
+        returns a new colormap based on the one given
+        but adjusted via power-law:
+
+        newcmap = oldcmap**a
+        '''
+        if a < 0.:
+            return cmap
+        cdict = copy.copy(cmap._segmentdata)
+        fn = lambda x : (x[0]**a, x[1], x[2])
+        for key in ('red','green','blue'):
+            cdict[key] = map(fn, cdict[key])
+            cdict[key].sort()
+            assert (cdict[key][0]<0 or cdict[key][-1]>1), \
+                "Resulting indices extend out of the [0, 1] segment."
+        return colors.LinearSegmentedColormap('colormap',cdict,1024)
+
+    if not ((range[0] < center) and (center < range[1])):
+        return cmap
+    return cmap_center_adjust(cmap,
+        abs(center - range[0]) / abs(range[1] - range[0]))
 
 def check_dependencies():
     """function that checks we have the requireded dependencies, namely:
@@ -171,6 +222,26 @@ def dispay_passed_args(workingfolder):
 
         if arguments['--preview']:
             lg.info("You have opted to preview your plot before making a movie.")
+
+        if arguments['--bias']:
+            lg.info("You want to create a movie of the bias from the mean (requires NCO tools...)")
+
+            try:
+                FNULL = open(os.devnull, 'w')
+                subprocess.call(["ncra", "--version"],stdout=FNULL, stderr=subprocess.STDOUT)
+            except OSError as e:
+                lg.error("You don't have NCO installed!")
+                sys.exit("You don't have NCO installed!")
+
+        if arguments['--bcmapcentre']:
+            lg.info("You want your bias plot to be centred around zero. (requires --cmap)")
+            if not arguments['--bias']:
+                lg.error("This option is only for a bias plot")
+                sys.exit("This option is only for a bias plot")
+
+            if not arguments['--cmap']:
+                lg.error("This option can only be used when you have specified a cmap (diverging colormap recommended)")
+                sys.exit("This option can only be used when you have specified a cmap (diverging colormap recommended)")
 
         if arguments['-o']:
             lg.info("You want your movie to live in: " + arguments['-o'])
@@ -338,6 +409,29 @@ class MovMaker(object):
         lg.info("Lights! Looking at your netCDF files...")
         var_timedims=[]
 
+        #create bias files
+        if arguments['--bias']:
+            #following example in http://linux.die.net/man/1/ncdiff
+            ncout='ncra '+' '.join(self.filelist)+' '+workingfol+'mean.nc'
+            subprocess.call(ncout,shell=True)
+
+            ncout='ncwa -O -a '+arguments['--bias']+' '+workingfol+'mean.nc '+workingfol+'mean_notime.nc'
+            lg.info("Creating a mean file: " + ncout)
+            subprocess.call(ncout,shell=True)
+
+            difffol=workingfol+'difffiles/'
+            mkdir(workingfol+'difffiles/')
+            newfilelist=[]
+            cnt=0
+            for f in self.filelist:
+                ncout='ncdiff '+' '+f+' '+workingfol+'mean_notime.nc '+difffol+os.path.basename(f)[:-3]+'_diff_'+str(cnt).zfill(5)+'.nc'
+                lg.info("Creating anomaly file: " + ncout)
+                subprocess.call(ncout,shell=True)
+                newfilelist.append(difffol+os.path.basename(f)[:-3]+'_diff_'+str(cnt).zfill(5)+'.nc')
+                cnt+=1
+
+            self.filelist=newfilelist
+                
         #error checks files, are all similar
         for f in self.filelist:
             if not os.path.exists(f):
@@ -512,9 +606,19 @@ class MovMaker(object):
                     cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
                             levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
                 else:
-                    cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
-                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
-                            cmap=arguments['--cmap'])
+
+                    if arguments['--bcmapcentre']:
+                        #will plot colourmap centred around zero
+                        oldcmap=matplotlib.cm.get_cmap(arguments['--cmap'])
+                        shiftd=cmap_center_point_adjust(oldcmap,[self.minvar,self.maxvar],0)
+                        cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                                levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
+                                cmap=shiftd)
+                    else:
+                        cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                                levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
+                                cmap=arguments['--cmap'])
+
 
                 plt.colorbar(cs1)
                 #plt.show()
@@ -631,6 +735,15 @@ if __name__ == "__main__":
     #remove working folder
     if arguments['-o']:
         if os.path.exists(workingfol):
+            #remove temp files from bias movie making
+            if arguments['--bias']:
+                tempfiles=\
+                sorted(glob.glob(workingfol+'*.nc'))+\
+                sorted(glob.glob(workingfol+'difffiles/*.nc'))
+                for f in tempfiles:
+                    os.remove(f)
+                os.rmdir(workingfol+'difffiles/')
+
             if not os.listdir(workingfol):
                 os.rmdir(workingfol)
                 lg.info("Working folder: " + workingfol +" removed.")

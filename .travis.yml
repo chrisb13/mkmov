@@ -8,7 +8,7 @@ notifications:
       - christopher.y.bull@student.unsw.edu.au
     on_success: change # default: change
     on_failure: always # default: always
-before_script: "sudo aptitude -y -q install ffmpeg"
+before_script: "sudo aptitude -y -q install ffmpeg;sudo aptitude -y -q install nco"
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
