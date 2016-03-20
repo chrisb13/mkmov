@@ -413,10 +413,11 @@ class MovMaker(object):
         if arguments['--bias']:
             #following example in http://linux.die.net/man/1/ncdiff
             ncout='ncra '+' '.join(self.filelist)+' '+workingfol+'mean.nc'
+            lg.info("Creating mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
             ncout='ncwa -O -a '+arguments['--bias']+' '+workingfol+'mean.nc '+workingfol+'mean_notime.nc'
-            lg.info("Creating a mean file: " + ncout)
+            lg.info("Removing time dimension from mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
             difffol=workingfol+'difffiles/'
