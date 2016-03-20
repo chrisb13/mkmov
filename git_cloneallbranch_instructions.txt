@@ -1,0 +1,8 @@
+#instructions to check out the other branches as well
+git clone https://chrisb13@github.com/chrisb13/mkmov
+git checkout origin/gh-pages
+git checkout -b gh-pages origin/gh-pages
+
+git checkout origin/3d
+git checkout -b 3d origin/3d
+
