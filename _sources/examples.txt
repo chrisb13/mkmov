@@ -255,4 +255,4 @@ Acknowledgements
 --------------------------------------------
 The altimeter products were produced by Ssalto/Duacs and distributed by Aviso with support from Cnes.
 
-TROPAC01 was developed within the framework of the DFG project SFB754 and integrated at the North-German Supercomputing Alliance (HLRN).
+TROPAC01 was developed in the ocean modelling group of GEOMAR, Kiel (Germany) with support by the DFG project SFB754 and integrated at the North-German Supercomputing Alliance (HLRN).
