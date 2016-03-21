@@ -15,7 +15,7 @@ before_script:
   
   #compile nco
   - wget https://github.com/nco/nco/archive/4.5.5.tar.gz
-  - vtar xvzf 4.5.5.tar.gz
+  - tar xvzf 4.5.5.tar.gz
   - cd nco-4.5.5
   - ./configure --prefix=/usr/local --enable-netcdf4
   - make
