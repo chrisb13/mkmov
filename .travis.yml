@@ -12,7 +12,17 @@ before_script:
   - sudo aptitude -y -q install ffmpeg
   - sudo aptitude -y -q install bison, flex, gsl, udunits
   - sudo aptitude -y -q install netcdf-bin libnetcdf-dev
-  - sudo aptitude -y -q install nco
+  
+  #compile nco
+  - wget https://github.com/nco/nco/archive/4.5.5.tar.gz
+  - vtar xvzf 4.5.5.tar.gz
+  - cd nco-4.5.5
+  - ./configure --prefix=/usr/local --enable-netcdf4
+  - make
+  - sudo make install
+  - export PATH=/usr/local/bin\:${PATH}
+  - export LD_LIBRARY_PATH=/usr/local/lib\:${LD_LIBRARY_PATH}
+  #- sudo aptitude -y -q install nco
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
