@@ -13,6 +13,7 @@ before_script:
   - sudo aptitude -y -q install bison, flex, gsl, udunits
   - sudo aptitude -y -q install netcdf-bin libnetcdf-dev
   
+  - mycwd="$PWD"
   #compile nco
   - wget https://github.com/nco/nco/archive/4.5.5.tar.gz
   - tar xvzf 4.5.5.tar.gz
@@ -23,6 +24,7 @@ before_script:
   - export PATH=/usr/local/bin\:${PATH}
   - export LD_LIBRARY_PATH=/usr/local/lib\:${LD_LIBRARY_PATH}
   #- sudo aptitude -y -q install nco
+  - cd "$mycwd"
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
