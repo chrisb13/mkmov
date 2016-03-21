@@ -9,10 +9,10 @@ notifications:
     on_success: change # default: change
     on_failure: always # default: always
 before_script: 
-  "sudo aptitude -y -q install ffmpeg"
-  "sudo aptitude -y -q install bison, flex, gsl, udunits"
-  "sudo aptitude -y -q install netcdf-bin libnetcdf-dev"
-  "sudo aptitude -y -q install nco"
+  - sudo aptitude -y -q install ffmpeg
+  - sudo aptitude -y -q install bison, flex, gsl, udunits
+  - sudo aptitude -y -q install netcdf-bin libnetcdf-dev
+  - sudo aptitude -y -q install nco
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
