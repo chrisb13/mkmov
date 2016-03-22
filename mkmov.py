@@ -28,7 +28,7 @@ Interface is by command line. Fully working examples can be found in: run_mkmov_
 
 Usage:
     mkmov.py -h
-    mkmov.py [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
     mkmov.py --stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
 
 Arguments:
@@ -45,6 +45,8 @@ Options:
     --bcmapcentre               : bias movie with centre around zero (need to also specify --cmap AND --bias)
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
+    --lmask2 LANDVAR2           : second land value to mask out (weird case where MOM6 has two landmask values! This option is unusual! (nb: if you select lmask2, you must specify lmask)
+    --lmaskfld                  : fill in landmask (as specified in lmask. nb: if you select lmaskfld, you must specify lmask)
     --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
     --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
     --clev LEVELS               : number of colour levels to have on the contour map (default is 50).
@@ -249,6 +251,19 @@ def dispay_passed_args(workingfolder):
         if arguments['--lmask']:
             lg.info("You want to mask out the following values: " + arguments['--lmask'])
 
+        if arguments['--lmask2']:
+            lg.info("You want to mask out a second set of land values, this is unusual! Your second value is: " + arguments['--lmask2'])
+            if not arguments['--lmask']:
+                lg.error("This option can only be used when you have specified a lmask")
+                sys.exit("This option can only be used when you have specified a lmask")
+
+        if arguments['--lmaskfld']:
+            lg.info("You want to fill in the land mask you specified in lmask.")
+
+            if not arguments['--lmask']:
+                lg.error("This option can only be used when you have specified a lmask")
+                sys.exit("This option can only be used when you have specified a lmask")
+
         if arguments['--fps']:
             lg.info("You have said your final movie will be: " + \
                     str(int(arguments['--fps']))+"  frames per second.")
@@ -413,10 +428,11 @@ class MovMaker(object):
         if arguments['--bias']:
             #following example in http://linux.die.net/man/1/ncdiff
             ncout='ncra '+' '.join(self.filelist)+' '+workingfol+'mean.nc'
+            lg.info("Creating mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
             ncout='ncwa -O -a '+arguments['--bias']+' '+workingfol+'mean.nc '+workingfol+'mean_notime.nc'
-            lg.info("Creating a mean file: " + ncout)
+            lg.info("Removing time dimension from mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
             difffol=workingfol+'difffiles/'
@@ -593,8 +609,17 @@ class MovMaker(object):
                         name_of_array==float(arguments['--lmask']),
                         name_of_array) 
 
-                    #land mask...
-                    cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+                    #weird case where we have two landmasks... (i.e. MOM5_010)
+                    if arguments['--lmask2']:
+                        name_of_array= np.ma.masked_where(
+                            name_of_array==float(arguments['--lmask2']),
+                            name_of_array) 
+
+                    if not arguments['--lmaskfld']:
+                        #land mask...
+                        cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+                    else:
+                        cs2=ax.contourf(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
 
 
                 if arguments['--clev']:

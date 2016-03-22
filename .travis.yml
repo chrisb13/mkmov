@@ -8,7 +8,23 @@ notifications:
       - christopher.y.bull@student.unsw.edu.au
     on_success: change # default: change
     on_failure: always # default: always
-before_script: "sudo aptitude -y -q install ffmpeg;sudo aptitude -y -q install nco"
+before_script: 
+  - sudo aptitude -y -q install ffmpeg
+  - sudo aptitude -y -q install bison, flex, gsl, udunits
+  - sudo aptitude -y -q install netcdf-bin libnetcdf-dev
+  
+  - mycwd="$PWD"
+  #compile nco
+  - wget https://github.com/nco/nco/archive/4.5.5.tar.gz
+  - tar xvzf 4.5.5.tar.gz
+  - cd nco-4.5.5
+  - ./configure --prefix=/usr/local --enable-netcdf4
+  - make
+  - sudo make install
+  - export PATH=/usr/local/bin\:${PATH}
+  - export LD_LIBRARY_PATH=/usr/local/lib\:${LD_LIBRARY_PATH}
+  #- sudo aptitude -y -q install nco
+  - cd "$mycwd"
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
@@ -44,6 +60,8 @@ install:
 #  - python setup.py install
 
 script:
+  - python mkmov.py --bias  time_counter --bcmapcentre --cmap seismic --min -.4 --max .7  --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+  - python mkmov.py --bias  time_counter --cmap seismic --min -.4 --max .7 -o $(pwd)/stitchmov.mov --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
   - python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
   - python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
   - python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
@@ -56,13 +74,11 @@ script:
   - python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
   - python mkmov.py --stitch -o $(pwd)/stitchmov2.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
   - python mkmov.py --stitch -o $(pwd)/stitchmov2.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
-  - python mkmov.py --bias  time_counter --bcmapcentre --cmap seismic --min -.4 --max .7  --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-  - python mkmov.py --bias  time_counter --cmap seismic --min -.4 --max .7 -o $(pwd)/stitchmov.mov --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 
 #download more examples
-  - git clone https://github.com/chrisb13/mkmovexamples.git $(pwd)/mkmovexamples
+  #- git clone https://github.com/chrisb13/mkmovexamples.git $(pwd)/mkmovexamples
   
-  - python mkmov.py adt --lmask -214748 --cmap Set3 -o $(pwd)/AVISOdt_global_allsat_madt_Set3.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
-  - python mkmov.py adt --lmask -214748 --x lon --y lat --cmap Accent -o $(pwd)/AVISOdt_global_allsat_madt_Accent.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
-  - python mkmov.py PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
-  - python mkmov.py PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
+  #- python mkmov.py adt --lmask -214748 --cmap Set3 -o $(pwd)/AVISOdt_global_allsat_madt_Set3.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
+  #- python mkmov.py adt --lmask -214748 --x lon --y lat --cmap Accent -o $(pwd)/AVISOdt_global_allsat_madt_Accent.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
+  #- python mkmov.py PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
+  #- python mkmov.py PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
