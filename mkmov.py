@@ -19,17 +19,37 @@
 
 
 """
-MkMov v0.3
-This is a python package for making movies. In can be used in two ways:
-    1] from a netCDF file
-    2] from a list of png files (use --stitch option)
+MkMov v0.4
+This is a python package for making movies. It has three things it can do:
+    [T1] movie of a netCDF file plotting contourf output (see "python mkmov.py 2d -h");
+    [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube (see "python mkmov.py 3dcube -h");
+    [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
+    [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
 
-Interface is by command line. Fully working examples can be found in: run_mkmov_examples.sh
+Usage: 
+    mkmov.py -h --help
+    mkmov.py <command> [-h --help] [<args>...]
 
-Usage:
-    mkmov.py -h
+Commands:
+   2d          [T1] use a netCDF file make a contourf of a 2d field
+   3dcube      [T2] use a netCDF file make a movie of a 3d field as a 3d cube
+   3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
+   stitch      [T4] stitch files together using ffmpeg
+   examples    show some examples of commands that work 'out of the box'
+
+See 'python mkmov.py help <command>' for more information on a specific command.
+
+Options:
+    -h,--help                   : show this help message
+"""
+
+TWOD=\
+"""
+MkMov: sub-command "2d" help.
+    [T1] movie of a netCDF file plotting contourf output.
+
+Usage: 
     mkmov.py [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
-    mkmov.py --stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -58,26 +78,75 @@ Options:
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
     --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
 
-Example tests (should work 'out of the box'):
-python mkmov.py zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 --killsplash zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
-python mkmov.py --stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
-python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
-python mkmov.py --stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
-
 References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
+cube3d = \
+"""
+MkMov: sub-command "3dcube" help.
+    [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube.
+
+Usage: basic.py 3dcube [options] [<name>]
+
+  -h --help         Show this screen.
+  --caps            Uppercase the output.
+  --greeting=<str>  Greeting to use [default: Hello].
+"""
+
+surf3d = \
+"""
+MkMov: sub-command "3dsurf" help.
+    [T3] movie of a netCDF file plotting a 2d variable as a 3d surface.
+
+Usage: basic.py 3dsurf [options] [<name>]
+
+  -h --help         Show this screen.
+  --caps            Uppercase the output.
+  --greeting=<str>  Greeting to use [default: Hello].
+"""
+
+STITCH = \
+"""
+MkMov: sub-command "stitch" help.
+    [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
+
+Usage: 
+    mkmov.py stitch -h
+    mkmov.py stitch [-o OUTPATH --fps FRATE --killsplash] FILE_NAMES...
+
+Arguments:
+    FILE_NAMES      list of files to stitch with ffmpeg 
+
+Options:
+    -h --help                   : Show this screen.
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --fps FRATE                 : frames rate in final movie (default is 15). Suggest keeping values above 10.
+    --killsplash                : do not display splash screen advertisement for MkMov at end of movie
+"""
+
+EXAMPLES=\
+"""
+python mkmov.py 2d zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 --fps 10 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py 2d --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 --killsplash zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+python mkmov.py stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
+python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
+python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
+"""
+
 from docopt import docopt
-arguments = docopt(__doc__)
+# arguments = docopt(__doc__)
+
+
+import mkmov.commands as sc
+
 import sys,os
 from cb2logger import *
 import imp
@@ -104,47 +173,6 @@ def mkdir(p):
           pass
        else: raise
 
-def cmap_center_point_adjust(cmap, range, center):
-    '''
-    converts center to a ratio between 0 and 1 of the
-    range given and calls cmap_center_adjust(). returns
-    a new adjusted colormap accordingly
-
-    NB: nicked from https://sites.google.com/site/theodoregoetz/notes/matplotlib_colormapadjust
-    '''
-    def cmap_center_adjust(cmap, center_ratio):
-        '''
-        returns a new colormap based on the one given
-        but adjusted so that the old center point higher
-        (>0.5) or lower (<0.5)
-        '''
-        if not (0. < center_ratio) & (center_ratio < 1.):
-            return cmap
-        a = math.log(center_ratio) / math.log(0.5)
-        return cmap_powerlaw_adjust(cmap, a)
-
-    def cmap_powerlaw_adjust(cmap, a):
-        '''
-        returns a new colormap based on the one given
-        but adjusted via power-law:
-
-        newcmap = oldcmap**a
-        '''
-        if a < 0.:
-            return cmap
-        cdict = copy.copy(cmap._segmentdata)
-        fn = lambda x : (x[0]**a, x[1], x[2])
-        for key in ('red','green','blue'):
-            cdict[key] = map(fn, cdict[key])
-            cdict[key].sort()
-            assert (cdict[key][0]<0 or cdict[key][-1]>1), \
-                "Resulting indices extend out of the [0, 1] segment."
-        return colors.LinearSegmentedColormap('colormap',cdict,1024)
-
-    if not ((range[0] < center) and (center < range[1])):
-        return cmap
-    return cmap_center_adjust(cmap,
-        abs(center - range[0]) / abs(range[1] - range[0]))
 
 def check_dependencies():
     """function that checks we have the requireded dependencies, namely:
@@ -186,141 +214,6 @@ def check_dependencies():
 
     lg.info("Good news: you seem to have all the right software installed!")
 
-def dispay_passed_args(workingfolder):
-    """function to print out the passed arguments to the logger
-
-    :workingfolder: @todo
-    :returns: @todo
-    """
-    lg.info("-----------------------------------------------------------------")
-    lg.info("MkMov has been run with the following options...")
-
-    if arguments['FILE_NAME']!=[]:
-        if len(arguments['FILE_NAME'])==1:
-            lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
-        elif len(arguments['FILE_NAME'])>1:
-            lg.info("We are making a movie of file(s): ")
-            for cnt,f in enumerate(arguments['FILE_NAME']):
-                lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
-
-        lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
-
-        lg.info("Our working directory is: "+ workingfolder)
-
-        lg.info("")
-        lg.info("Optional settings:")
-
-        #for optional parameters...
-        if (arguments['--min'] is not None) and (arguments['--max'] is not None):
-            lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
-
-        #error check to make sure both min and max were passed
-        if (arguments['--min'] is not None) and (arguments['--max'] is None):
-            lg.error("You passed min but not max")
-            sys.exit("You passed min but not max")
-        elif(arguments['--min'] is None) and (arguments['--max'] is not None): 
-            lg.error("You passed max but not min")
-            sys.exit("You passed max but not min")
-
-        if arguments['--preview']:
-            lg.info("You have opted to preview your plot before making a movie.")
-
-        if arguments['--bias']:
-            lg.info("You want to create a movie of the bias from the mean (requires NCO tools...)")
-
-            try:
-                FNULL = open(os.devnull, 'w')
-                subprocess.call(["ncra", "--version"],stdout=FNULL, stderr=subprocess.STDOUT)
-            except OSError as e:
-                lg.error("You don't have NCO installed!")
-                sys.exit("You don't have NCO installed!")
-
-        if arguments['--bcmapcentre']:
-            lg.info("You want your bias plot to be centred around zero. (requires --cmap)")
-            if not arguments['--bias']:
-                lg.error("This option is only for a bias plot")
-                sys.exit("This option is only for a bias plot")
-
-            if not arguments['--cmap']:
-                lg.error("This option can only be used when you have specified a cmap (diverging colormap recommended)")
-                sys.exit("This option can only be used when you have specified a cmap (diverging colormap recommended)")
-
-        if arguments['-o']:
-            lg.info("You want your movie to live in: " + arguments['-o'])
-
-        if arguments['--lmask']:
-            lg.info("You want to mask out the following values: " + arguments['--lmask'])
-
-        if arguments['--lmask2']:
-            lg.info("You want to mask out a second set of land values, this is unusual! Your second value is: " + arguments['--lmask2'])
-            if not arguments['--lmask']:
-                lg.error("This option can only be used when you have specified a lmask")
-                sys.exit("This option can only be used when you have specified a lmask")
-
-        if arguments['--lmaskfld']:
-            lg.info("You want to fill in the land mask you specified in lmask.")
-
-            if not arguments['--lmask']:
-                lg.error("This option can only be used when you have specified a lmask")
-                sys.exit("This option can only be used when you have specified a lmask")
-
-        if arguments['--fps']:
-            lg.info("You have said your final movie will be: " + \
-                    str(int(arguments['--fps']))+"  frames per second.")
-
-        if arguments['--cmap']:
-            lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
-                    arguments['--cmap'])
-
-        if arguments['--clev']:
-            lg.info("You have said you would like to contourf with the following number of levels: " + \
-                    str(int(arguments['--clev'])))
-
-        if arguments['--4dvar']:
-            lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
-                    str(int(arguments['--4dvar'])))
-
-        if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
-            lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
-
-        if (arguments['--x'] is not None) and (arguments['--y'] is not None):
-            lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
-
-        #error check to make sure both x and y variables were passed
-        if (arguments['--x'] is not None) and (arguments['--y'] is None):
-            lg.error("You passed xvariable but not a yvariable")
-            sys.exit("You passed xvariable but not a yvariable")
-        elif(arguments['--x'] is None) and (arguments['--y'] is not None): 
-            lg.error("You passed yvariable but not a xvariable")
-            sys.exit("You passed yvariable but not a xvariable")
-
-        if arguments['--killsplash']:
-            lg.info("You have asked for the MkMov splash screen to NOT be displayed at the end of your movie.")
-
-        #error check to make sure both figwith and fighgt were passed
-        if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is None):
-            lg.error("You passed figwth but not fighgt")
-            sys.exit("You passed figwth but not fighgt")
-        elif(arguments['--figwth'] is None) and (arguments['--fighgt'] is not None): 
-            lg.error("You passed fighgt but not figwth")
-            sys.exit("You passed fighgt but not figwth")
-
-        lg.info("-----------------------------------------------------------------")
-    elif arguments['FILE_NAMES']!=[]:
-        lg.info("We are making a movie from your passed list of png files.")
-        lg.info("Our working directory is: "+ workingfolder)
-        lg.info("")
-        lg.info("Optional settings:")
-
-        if arguments['-o']:
-            lg.info("You have specified you want your movie to live in: " + arguments['-o'])
-
-        if arguments['--fps']:
-            lg.info("You have said your final movie will be: " + \
-                    str(int(arguments['--fps']))+"  frames per second.")
-
-        lg.info("-----------------------------------------------------------------")
-    return
 
 def call_ffmpeg(pngfolder):
     """function that actually calls ffmpeg to stitch all the png together
@@ -718,8 +611,10 @@ def stitch_action(workingfolder):
 
     call_ffmpeg(workingfolder)
 
-if __name__ == "__main__": 
-    LogStart('',fout=False)
+def workingfol_func():
+    """@todo: Docstring for workingfol_func
+    :returns: @todo
+    """
     # print arguments
     if not arguments['-o']:
         workingfol=tempfile.mkdtemp()+'/'
@@ -731,49 +626,92 @@ if __name__ == "__main__":
             sys.exit("Working folder: " + workingfol+". already exists, has mkmov failed previously? Please remove and restart.")
         mkdir(workingfol)
 
-    dispay_passed_args(workingfol)
+    return
 
-    check_dependencies()
+def greet(args):
+    print(args)
 
-    #We are in making movie mode...
-    #main.py [OPTIONS] VARIABLE_NAME FILE_NAME...
-    if arguments['FILE_NAME']!=[]:
-        from netCDF4 import Dataset
-        if not arguments['--preview']:
-            #for travis-ci
-            import matplotlib
-            matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        import numpy as np
+if __name__ == "__main__": 
+    LogStart('',fout=False)
 
-        movmk=MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol)
 
-        #aah I've always wanted to say this!
-        movmk.lights()
-        movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
-        movmk.action()
-    #We are in stitching mode
-    #main.py --stitch  FILE_NAMES...
-    elif arguments['FILE_NAMES']!=[]:
-        stitch_action(workingfol)
+    arguments_top = docopt(__doc__, options_first=True)
 
-    #remove working folder
-    if arguments['-o']:
-        if os.path.exists(workingfol):
-            #remove temp files from bias movie making
-            if arguments['--bias']:
-                tempfiles=\
-                sorted(glob.glob(workingfol+'*.nc'))+\
-                sorted(glob.glob(workingfol+'difffiles/*.nc'))
-                for f in tempfiles:
-                    os.remove(f)
-                os.rmdir(workingfol+'difffiles/')
+    if arguments_top['<command>'] == '2d':
+        arguments=docopt(TWOD)
 
-            if not os.listdir(workingfol):
-                os.rmdir(workingfol)
-                lg.info("Working folder: " + workingfol +" removed.")
-            else:
-                lg.warning("Working directory: " + workingfol+" not empty, please remove manually")
+        workingfol_func()
+
+        # import ipdb
+        # ipdb.set_trace()
+        # sc.dispay_passed_args(arguments,workingfol)
+    elif arguments_top['<command>'] == '3dcube':
+        greet(docopt(cube3d))
+    elif arguments_top['<command>'] == '3dsurf':
+        greet(docopt(surf3d))
+    elif arguments_top['<command>'] == 'stitch':
+        greet(docopt(STITCH))
+    elif arguments_top['<command>'] == 'examples':
+        print(EXAMPLES)
+    #display help messages
+    #this needs to be above, what comes next...
+    elif arguments_top['<command>'] == 'help' and len(arguments_top['<args>'])==0:
+        subprocess.call(['python','mkmov.py', '--help'])
+    elif arguments_top['<command>'] == 'help' and (arguments_top['<args>'][0] in '2d 3dcube 3dsurf stitch examples'.split()):
+        subprocess.call(['python','mkmov.py', arguments_top['<args>'][0],'--help'])
+    elif arguments_top['<command>'] == 'help' and not (arguments_top['<args>'][0] in '2d 3dcube 3dsurf stitch examples'.split()):
+        print "I don't recognise that sub-command"
+    else:
+        print "error"
+
+
+
+
+
+    # dispay_passed_args(workingfol)
+
+    # check_dependencies()
+
+    # #We are in making movie mode...
+    # #main.py [OPTIONS] VARIABLE_NAME FILE_NAME...
+    # if arguments['FILE_NAME']!=[]:
+        # from netCDF4 import Dataset
+        # if not arguments['--preview']:
+            # #for travis-ci
+            # import matplotlib
+            # matplotlib.use('Agg')
+        # import matplotlib.pyplot as plt
+        # import numpy as np
+
+        # movmk=MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol)
+
+        # #aah I've always wanted to say this!
+        # movmk.lights()
+        # movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
+        # movmk.action()
+    # #We are in stitching mode
+    # #main.py --stitch  FILE_NAMES...
+    # elif arguments['FILE_NAMES']!=[]:
+        # stitch_action(workingfol)
+
+    # #remove working folder
+    # if arguments['-o']:
+        # if os.path.exists(workingfol):
+            # #remove temp files from bias movie making
+            # if arguments['--bias']:
+                # tempfiles=\
+                # sorted(glob.glob(workingfol+'*.nc'))+\
+                # sorted(glob.glob(workingfol+'difffiles/*.nc'))
+                # for f in tempfiles:
+                    # os.remove(f)
+                # os.rmdir(workingfol+'difffiles/')
+
+            # if not os.listdir(workingfol):
+                # os.rmdir(workingfol)
+                # lg.info("Working folder: " + workingfol +" removed.")
+            # else:
+                # lg.warning("Working directory: " + workingfol+" not empty, please remove manually")
+
     lg.info('')
     localtime = time.asctime( time.localtime(time.time()) )
     lg.info("Local current time : "+ str(localtime))
