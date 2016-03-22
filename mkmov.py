@@ -144,8 +144,7 @@ python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/exam
 from docopt import docopt
 # arguments = docopt(__doc__)
 
-
-import mkmov.commands as sc
+import commands as sc
 
 import sys,os
 from cb2logger import *
@@ -626,25 +625,25 @@ def workingfol_func():
             sys.exit("Working folder: " + workingfol+". already exists, has mkmov failed previously? Please remove and restart.")
         mkdir(workingfol)
 
-    return
+    return workingfol
 
 def greet(args):
     print(args)
 
 if __name__ == "__main__": 
-    LogStart('',fout=False)
-
+    lg=LogStart('',fout=False)
 
     arguments_top = docopt(__doc__, options_first=True)
 
     if arguments_top['<command>'] == '2d':
         arguments=docopt(TWOD)
 
-        workingfol_func()
+        workingfol=workingfol_func()
 
-        # import ipdb
-        # ipdb.set_trace()
-        # sc.dispay_passed_args(arguments,workingfol)
+        sc.dispay_passed_args(arguments,workingfol)
+        import ipdb
+        ipdb.set_trace()
+
     elif arguments_top['<command>'] == '3dcube':
         greet(docopt(cube3d))
     elif arguments_top['<command>'] == '3dsurf':
