@@ -6,6 +6,56 @@ Youtube Examples
 Here are some videos that are made by MkMov. If you've got an awesome video of netCDF output you've made with MkMov, get in touch and we'll add it to the site! If you do sent in a video, please also send the command you used to make it and a caption, describing  what you've plotted.
 
 ------------------------------------
+mom5_010 Accent
+------------------------------------
+
+Daily SSH from MOM5 0.10 degree global simulation CORENYF forcing, Accent colourmap.
+
+.. raw:: html
+
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/HRmYEOloEjI" frameborder="0" allowfullscreen></iframe>
+    
+
+Video was made with....
+::
+    python mkmov.py --lmask -1e34 --lmask2 0 --lmaskfld --cmap Accent --min -2 --max 2 --x xt --y yt -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movieout/mom01v4_ssh_maskgd.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/mom10.ssh_daily.yr*.nc
+
+------------------------------------
+mom5_010 Paired
+------------------------------------
+
+Daily SSH from MOM5 0.10 degree global simulation CORENYF forcing, Paired colourmap.
+
+.. raw:: html
+
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/AnhczYNSeaE" frameborder="0" allowfullscreen></iframe>
+
+Video was made with....
+::
+    python mkmov.py --lmask -1e34 --lmask2 0 --lmaskfld --cmap Paired --min -2 --max 2 --x xt --y yt -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movieout/mom01v4_ssh_maskgd_Paired.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/mom10.ssh_daily.yr*.nc
+
+------------------------------------
+mom5_010_3year_bias_seismic 
+------------------------------------
+
+Daily SSH anomalies (from 10 year mean) MOM5 0.10 degree global simulation CORENYF forcing
+
+.. raw:: html
+
+    <iframe width="480" height="385" src="https://www.youtube.com/embed/D31F1TMV40E" frameborder="0" allowfullscreen></iframe>
+
+Video was made with....
+::
+    #Due to the size of these files, they were made in a few steps…
+    #to create the anomaly files
+    python mkmov.py --bias time --x xt --y yt -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/biastest.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/mom10.ssh_daily.yr10.nc
+    python mkmov.py --bias time --x xt --y yt -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/biastest_yr11.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/mom10.ssh_daily.yr11.nc
+    python mkmov.py --bias time --x xt --y yt -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/biastest_yr12.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/mom10.ssh_daily.yr12.nc
+
+    #then to create one movie from the output bias files
+    python mkmov.py --lmask -1e34 --lmask2 0 --lmaskfld --x xt --y yt --min -0.8 --max 0.8  --cmap seismic -o /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/ps_mom01v4_3year_bias_gdlmask.mov SSH /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/mkmovTEMPFOL4_biastest/difffiles/mom10.ssh_daily.yr10_diff_00000.nc  /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/mkmovTEMPFOL4_biastest_yr11/difffiles/mom10.ssh_daily.yr11_diff_00000.nc /srv/ccrc/data42/z3457920/RawData/ps_mom01v4/movout2/mkmovTEMPFOL4_biastest_yr12/difffiles/mom10.ssh_daily.yr12_diff_00000.nc
+
+------------------------------------
 1_TROPAC01-TRC001_5d_sossheig_Dark2
 ------------------------------------
 
