@@ -87,7 +87,7 @@ MkMov: sub-command "3dcube" help.
     [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube.
 
 Usage: 
-    mkmov.py 3dcube [-o OUTPATH --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py 3dcube [-o OUTPATH --preview --killsplash] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -96,6 +96,7 @@ Arguments:
 Options:
     -h,--help                   : show this help message
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --preview                   : show a preview of the plot (will exit afterwards).
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
 
 Note: feature is still in development.

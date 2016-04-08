@@ -1,6 +1,7 @@
 import numpy as np
 from netCDF4 import Dataset
 import os
+import sys
 
 from ._threedcube import _LogStart
 _lg=_LogStart().setup()
@@ -21,131 +22,116 @@ def dispay_passed_args_threedcube(arguments,workingfolder):
     _lg.info("-----------------------------------------------------------------")
     _lg.info("MkMov has been run with the following options...")
 
-    if arguments['FILE_NAME']!=[]:
-        if len(arguments['FILE_NAME'])==1:
-            _lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
-        elif len(arguments['FILE_NAME'])>1:
-            _lg.info("We are making a movie of file(s): ")
-            for cnt,f in enumerate(arguments['FILE_NAME']):
-                _lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
+    if len(arguments['FILE_NAME'])==1:
+        _lg.info("We are making a movie of file: "+ os.path.basename(arguments['FILE_NAME'][0]))
+    elif len(arguments['FILE_NAME'])>1:
+        _lg.info("We are making a movie of file(s): ")
+        for cnt,f in enumerate(arguments['FILE_NAME']):
+            _lg.info("File num: "+str(cnt+1)+'. File is: '+ os.path.basename(f))
 
-        _lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
+    _lg.info("Variable we are making a movie of: "+ arguments['VARIABLE_NAME'])
 
-        _lg.info("Our working directory is: "+ workingfolder)
+    _lg.info("Our working directory is: "+ workingfolder)
 
-        # _lg.info("")
-        # _lg.info("Optional settings:")
+    _lg.info("")
+    _lg.info("Optional settings:")
 
-        # #for optional parameters...
-        # if (arguments['--min'] is not None) and (arguments['--max'] is not None):
-            # _lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
+    # #for optional parameters...
+    # if (arguments['--min'] is not None) and (arguments['--max'] is not None):
+        # _lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
 
-        # #error check to make sure both min and max were passed
-        # if (arguments['--min'] is not None) and (arguments['--max'] is None):
-            # _lg.error("You passed min but not max")
-            # sys.exit("You passed min but not max")
-        # elif(arguments['--min'] is None) and (arguments['--max'] is not None): 
-            # _lg.error("You passed max but not min")
-            # sys.exit("You passed max but not min")
+    # #error check to make sure both min and max were passed
+    # if (arguments['--min'] is not None) and (arguments['--max'] is None):
+        # _lg.error("You passed min but not max")
+        # sys.exit("You passed min but not max")
+    # elif(arguments['--min'] is None) and (arguments['--max'] is not None): 
+        # _lg.error("You passed max but not min")
+        # sys.exit("You passed max but not min")
 
-        # if arguments['--preview']:
-            # _lg.info("You have opted to preview your plot before making a movie.")
+    if arguments['--preview']:
+        _lg.info("You have opted to preview your plot before making a movie.")
 
-        # if arguments['--bias']:
-            # _lg.info("You want to create a movie of the bias from the mean (requires NCO tools...)")
+    # if arguments['--bias']:
+        # _lg.info("You want to create a movie of the bias from the mean (requires NCO tools...)")
 
-            # try:
-                # FNULL = open(os.devnull, 'w')
-                # subprocess.call(["ncra", "--version"],stdout=FNULL, stderr=subprocess.STDOUT)
-            # except OSError as e:
-                # _lg.error("You don't have NCO installed!")
-                # sys.exit("You don't have NCO installed!")
+        # try:
+            # FNULL = open(os.devnull, 'w')
+            # subprocess.call(["ncra", "--version"],stdout=FNULL, stderr=subprocess.STDOUT)
+        # except OSError as e:
+            # _lg.error("You don't have NCO installed!")
+            # sys.exit("You don't have NCO installed!")
 
-        # if arguments['--bcmapcentre']:
-            # _lg.info("You want your bias plot to be centred around zero. (requires --cmap)")
-            # if not arguments['--bias']:
-                # _lg.error("This option is only for a bias plot")
-                # sys.exit("This option is only for a bias plot")
+    # if arguments['--bcmapcentre']:
+        # _lg.info("You want your bias plot to be centred around zero. (requires --cmap)")
+        # if not arguments['--bias']:
+            # _lg.error("This option is only for a bias plot")
+            # sys.exit("This option is only for a bias plot")
 
-            # if not arguments['--cmap']:
-                # _lg.error("This option can only be used when you have specified a cmap (diverging colormap recommended)")
-                # sys.exit("This option can only be used when you have specified a cmap (diverging colormap recommended)")
+        # if not arguments['--cmap']:
+            # _lg.error("This option can only be used when you have specified a cmap (diverging colormap recommended)")
+            # sys.exit("This option can only be used when you have specified a cmap (diverging colormap recommended)")
 
-        # if arguments['-o']:
-            # _lg.info("You want your movie to live in: " + arguments['-o'])
+    # if arguments['-o']:
+        # _lg.info("You want your movie to live in: " + arguments['-o'])
 
-        # if arguments['--lmask']:
-            # _lg.info("You want to mask out the following values: " + arguments['--lmask'])
+    # if arguments['--lmask']:
+        # _lg.info("You want to mask out the following values: " + arguments['--lmask'])
 
-        # if arguments['--lmask2']:
-            # _lg.info("You want to mask out a second set of land values, this is unusual! Your second value is: " + arguments['--lmask2'])
-            # if not arguments['--lmask']:
-                # _lg.error("This option can only be used when you have specified a lmask")
-                # sys.exit("This option can only be used when you have specified a lmask")
+    # if arguments['--lmask2']:
+        # _lg.info("You want to mask out a second set of land values, this is unusual! Your second value is: " + arguments['--lmask2'])
+        # if not arguments['--lmask']:
+            # _lg.error("This option can only be used when you have specified a lmask")
+            # sys.exit("This option can only be used when you have specified a lmask")
 
-        # if arguments['--lmaskfld']:
-            # _lg.info("You want to fill in the land mask you specified in lmask.")
+    # if arguments['--lmaskfld']:
+        # _lg.info("You want to fill in the land mask you specified in lmask.")
 
-            # if not arguments['--lmask']:
-                # _lg.error("This option can only be used when you have specified a lmask")
-                # sys.exit("This option can only be used when you have specified a lmask")
+        # if not arguments['--lmask']:
+            # _lg.error("This option can only be used when you have specified a lmask")
+            # sys.exit("This option can only be used when you have specified a lmask")
 
-        # if arguments['--fps']:
-            # _lg.info("You have said your final movie will be: " + \
-                    # str(int(arguments['--fps']))+"  frames per second.")
+    # if arguments['--fps']:
+        # _lg.info("You have said your final movie will be: " + \
+                # str(int(arguments['--fps']))+"  frames per second.")
 
-        # if arguments['--cmap']:
-            # _lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
-                    # arguments['--cmap'])
+    # if arguments['--cmap']:
+        # _lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
+                # arguments['--cmap'])
 
-        # if arguments['--clev']:
-            # _lg.info("You have said you would like to contourf with the following number of levels: " + \
-                    # str(int(arguments['--clev'])))
+    # if arguments['--clev']:
+        # _lg.info("You have said you would like to contourf with the following number of levels: " + \
+                # str(int(arguments['--clev'])))
 
-        # if arguments['--4dvar']:
-            # _lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
-                    # str(int(arguments['--4dvar'])))
+    # if arguments['--4dvar']:
+        # _lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
+                # str(int(arguments['--4dvar'])))
 
-        # if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
-            # _lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
+    # if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
+        # _lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
 
-        # if (arguments['--x'] is not None) and (arguments['--y'] is not None):
-            # _lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
+    # if (arguments['--x'] is not None) and (arguments['--y'] is not None):
+        # _lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
 
-        # #error check to make sure both x and y variables were passed
-        # if (arguments['--x'] is not None) and (arguments['--y'] is None):
-            # _lg.error("You passed xvariable but not a yvariable")
-            # sys.exit("You passed xvariable but not a yvariable")
-        # elif(arguments['--x'] is None) and (arguments['--y'] is not None): 
-            # _lg.error("You passed yvariable but not a xvariable")
-            # sys.exit("You passed yvariable but not a xvariable")
+    # #error check to make sure both x and y variables were passed
+    # if (arguments['--x'] is not None) and (arguments['--y'] is None):
+        # _lg.error("You passed xvariable but not a yvariable")
+        # sys.exit("You passed xvariable but not a yvariable")
+    # elif(arguments['--x'] is None) and (arguments['--y'] is not None): 
+        # _lg.error("You passed yvariable but not a xvariable")
+        # sys.exit("You passed yvariable but not a xvariable")
 
-        # if arguments['--killsplash']:
-            # _lg.info("You have asked for the MkMov splash screen to NOT be displayed at the end of your movie.")
+    # if arguments['--killsplash']:
+        # _lg.info("You have asked for the MkMov splash screen to NOT be displayed at the end of your movie.")
 
-        # #error check to make sure both figwith and fighgt were passed
-        # if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is None):
-            # _lg.error("You passed figwth but not fighgt")
-            # sys.exit("You passed figwth but not fighgt")
-        # elif(arguments['--figwth'] is None) and (arguments['--fighgt'] is not None): 
-            # _lg.error("You passed fighgt but not figwth")
-            # sys.exit("You passed fighgt but not figwth")
+    # #error check to make sure both figwith and fighgt were passed
+    # if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is None):
+        # _lg.error("You passed figwth but not fighgt")
+        # sys.exit("You passed figwth but not fighgt")
+    # elif(arguments['--figwth'] is None) and (arguments['--fighgt'] is not None): 
+        # _lg.error("You passed fighgt but not figwth")
+        # sys.exit("You passed fighgt but not figwth")
 
-        _lg.info("-----------------------------------------------------------------")
-    elif arguments['FILE_NAMES']!=[]:
-        _lg.info("We are making a movie from your passed list of png files.")
-        _lg.info("Our working directory is: "+ workingfolder)
-        _lg.info("")
-        # _lg.info("Optional settings:")
-
-        # if arguments['-o']:
-            # _lg.info("You have specified you want your movie to live in: " + arguments['-o'])
-
-        # if arguments['--fps']:
-            # _lg.info("You have said your final movie will be: " + \
-                    # str(int(arguments['--fps']))+"  frames per second.")
-
-        # _lg.info("-----------------------------------------------------------------")
+    _lg.info("-----------------------------------------------------------------")
     return
 
 
@@ -242,7 +228,7 @@ class MovMakerThreeDCube(object):
             sys.exit("(Unlimited) 'time' dimension was not the same across all files, fatal error.")
         return
         
-    def camera(self,minvar=None,maxvar=None,plotpreview=False):
+    def camera(self,minvar=None,maxvar=None):
         """function to create plots.
         
         :workingfolder: @todo
@@ -251,6 +237,7 @@ class MovMakerThreeDCube(object):
         #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
         from matplotlib import cm
         import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
 
         def getdata():
             """function that grabs the data
@@ -416,7 +403,7 @@ class MovMakerThreeDCube(object):
                 # plt.colorbar(cs1)
                 # #plt.show()
 
-                if plotpreview:
+                if self.arguments['--preview']:
                     plt.show()
                     _lg.info("Okay, we've shown you your plot, exiting...")
                     sys.exit("Okay, we've shown you your plot, exiting...")
