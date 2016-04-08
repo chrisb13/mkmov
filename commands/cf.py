@@ -2,6 +2,7 @@ import imp
 import os
 import subprocess
 import sys
+import tempfile
 
 from ._cf import _LogStart
 _lg=_LogStart().setup()

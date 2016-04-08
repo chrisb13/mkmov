@@ -54,7 +54,6 @@ Usage:
 Arguments:
     VARIABLE_NAME   variable name
     FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
-    FILE_NAMES      list of files to stich with ffmpeg 
 
 Options:
     -h,--help                   : show this help message
@@ -87,9 +86,19 @@ cube3d = \
 MkMov: sub-command "3dcube" help.
     [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube.
 
-Usage: basic.py 3dcube [options] [<name>]
+Usage: 
+    mkmov.py 3dcube [-o OUTPATH --killsplash] VARIABLE_NAME FILE_NAME...
 
-  -h --help         Show this screen.
+Arguments:
+    VARIABLE_NAME   variable name
+    FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
+
+Options:
+    -h,--help                   : show this help message
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --killsplash                : do not display splash screen advertisement for MkMov at end of movie
+
+Note: feature is still in development.
 """
 
 surf3d = \
@@ -100,6 +109,8 @@ MkMov: sub-command "3dsurf" help.
 Usage: basic.py 3dsurf [options] [<name>]
 
   -h --help         Show this screen.
+
+Note: feature is still in development.
 """
 
 STITCH = \
@@ -192,9 +203,23 @@ if __name__ == "__main__":
             movmk.lights()
             movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
             movmk.action()
+            # movmk.cleanup()
 
     elif arguments_top['<command>'] == '3dcube':
-        greet(docopt(cube3d))
+        # greet(docopt(cube3d))
+
+        arguments=docopt(cube3d)
+
+        workingfol=sc.workingfol_func(arguments)
+
+        sc.dispay_passed_args_threedcube(arguments,workingfol)
+
+        movmk=sc.MovMakerThreeDCube(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
+
+        movmk.lights()
+        movmk.camera()
+        movmk.action()
+        # movmk.cleanup()
 
     elif arguments_top['<command>'] == '3dsurf':
         greet(docopt(surf3d))
@@ -220,9 +245,3 @@ if __name__ == "__main__":
         print "I don't recognise that sub-command"
     else:
         print "error"
-
-
-    # lg.info('')
-    # localtime = time.asctime( time.localtime(time.time()) )
-    # lg.info("Local current time : "+ str(localtime))
-    # lg.info('SCRIPT ended')
