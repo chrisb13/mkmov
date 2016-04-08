@@ -1,8 +1,3 @@
-#cube imports 
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import Dataset
 import os
@@ -254,6 +249,7 @@ class MovMakerThreeDCube(object):
         :returns: @todo
         """
         #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
+        from matplotlib import cm
         import matplotlib.pyplot as plt
 
         def getdata():

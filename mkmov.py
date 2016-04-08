@@ -191,19 +191,18 @@ if __name__ == "__main__":
 
         #We are in 2d movie making mode...
         #main.py [OPTIONS] VARIABLE_NAME FILE_NAME...
-        if arguments['FILE_NAME']!=[]:
-            if not arguments['--preview']:
-                #for travis-ci
-                import matplotlib
-                matplotlib.use('Agg')
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
 
-            movmk=sc.MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
+        movmk=sc.MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
 
-            #aah I've always wanted to say this!
-            movmk.lights()
-            movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
-            movmk.action()
-            # movmk.cleanup()
+        #aah I've always wanted to say this!
+        movmk.lights()
+        movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
+        movmk.action()
+        # movmk.cleanup()
 
     elif arguments_top['<command>'] == '3dcube':
         # greet(docopt(cube3d))
@@ -213,6 +212,11 @@ if __name__ == "__main__":
         workingfol=sc.workingfol_func(arguments)
 
         sc.dispay_passed_args_threedcube(arguments,workingfol)
+
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
 
         movmk=sc.MovMakerThreeDCube(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
 
