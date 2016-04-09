@@ -135,6 +135,7 @@ def dispay_passed_args_threedcube(arguments,workingfolder):
     return
 
 
+
 class MovMakerThreeDCube(object):
     """
     Class to create movie based on file list and variable name.
@@ -402,6 +403,8 @@ class MovMakerThreeDCube(object):
 
                 # plt.colorbar(cs1)
                 # #plt.show()
+
+                scf.axisEqual3D(ax)
 
                 if self.arguments['--preview']:
                     plt.show()

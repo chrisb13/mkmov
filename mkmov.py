@@ -107,9 +107,19 @@ surf3d = \
 MkMov: sub-command "3dsurf" help.
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface.
 
-Usage: basic.py 3dsurf [options] [<name>]
+Usage: 
+    mkmov.py 3dsurf [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --killsplash] VARIABLE_NAME FILE_NAME...
 
-  -h --help         Show this screen.
+Arguments:
+    VARIABLE_NAME   variable name
+    FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
+
+Options:
+    -h,--help                   : show this help message
+    --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
+    --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --preview                   : show a preview of the plot (will exit afterwards).
 
 Note: feature is still in development.
 """
@@ -135,6 +145,9 @@ Options:
 
 EXAMPLES=\
 """
+MkMov: sub-command "examples". Here are some examples that work 'out of the box' (example data included).
+
+    [T1] movie of a netCDF file plotting contourf output (see "python mkmov.py 2d -h");
 python mkmov.py 2d zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py 2d --min -1 --max 1 -o $(pwd)/zos_example.mov zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py 2d --min -1 --max 1 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
@@ -144,36 +157,16 @@ python mkmov.py 2d --min -1 --max 1 --lmask 0 --fps 10 --cmap jet zos examples/c
 python mkmov.py 2d --min -1 --max 1 --lmask 0 --fps 10 --cmap autumn --clev 60 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py 2d --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
 python mkmov.py 2d --min -1 --max 1 --lmask 0 --figwth 10 --fighgt 12 --killsplash zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+
+    [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
 python mkmov.py stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
 """
 
 from docopt import docopt
-# arguments = docopt(__doc__)
-
 import commands as sc
-
-import sys,os
-# from cb2logger import LogStart
-import cb2logger
-
-import tempfile
 import subprocess
-
-import glob
-
-#for cmap_center_point_adjust function
-import math
-import copy
-# from matplotlib import colors
-# import matplotlib
-
-
-
-
-def greet(args):
-    print(args)
 
 if __name__ == "__main__": 
     # not really sure why global logger is no longer working :(
@@ -206,7 +199,6 @@ if __name__ == "__main__":
         # movmk.cleanup()
 
     elif arguments_top['<command>'] == '3dcube':
-        # greet(docopt(cube3d))
 
         arguments=docopt(cube3d)
 
@@ -221,13 +213,31 @@ if __name__ == "__main__":
 
         movmk=sc.MovMakerThreeDCube(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
 
+        #aah I've always wanted to say this!
         movmk.lights()
         movmk.camera()
         movmk.action()
         # movmk.cleanup()
 
     elif arguments_top['<command>'] == '3dsurf':
-        greet(docopt(surf3d))
+
+        arguments=docopt(surf3d)
+
+        workingfol=sc.workingfol_func(arguments)
+
+        sc.dispay_passed_args_threedsurf(arguments,workingfol)
+
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
+
+        movmk=sc.MovMakerThreeDSurf(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
+
+        #aah I've always wanted to say this!
+        movmk.lights()
+        movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'])
+        movmk.action()
 
     elif arguments_top['<command>'] == 'stitch':
 
@@ -239,7 +249,6 @@ if __name__ == "__main__":
         print(EXAMPLES)
 
     #display help messages
-    #this needs to be above, what comes next...
     elif arguments_top['<command>'] == 'help' and len(arguments_top['<args>'])==0:
         subprocess.call(['python','mkmov.py', '--help'])
 
@@ -247,6 +256,6 @@ if __name__ == "__main__":
         subprocess.call(['python','mkmov.py', arguments_top['<args>'][0],'--help'])
 
     elif arguments_top['<command>'] == 'help' and not (arguments_top['<args>'][0] in '2d 3dcube 3dsurf stitch examples'.split()):
-        print "I don't recognise that sub-command"
+        print("MkMov: I don't recognise that sub-command. Type 'python mkmov.py -h' to see available sub-commands.")
     else:
-        print "error"
+        print("MkMov: I don't recognise that command. Type 'python mkmov.py -h' for help.")

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import glob
+import numpy as np
 
 from ._scf import _LogStart
 _lg=_LogStart().setup()
@@ -59,3 +60,15 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
         _lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
         sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
 
+def axisEqual3D(ax):
+    """
+    nice little hack to make the 3d plot look less cube like!
+    from: http://stackoverflow.com/questions/8130823/set-matplotlib-3d-plot-aspect-ratio
+    """
+    extents = np.array([getattr(ax, 'get_{}lim'.format(dim))() for dim in 'xyz'])
+    sz = extents[:,1] - extents[:,0]
+    centers = np.mean(extents, axis=1)
+    maxsize = max(abs(sz))
+    r = maxsize/2
+    for ctr, dim in zip(centers, 'xyz'):
+        getattr(ax, 'set_{}lim'.format(dim))(ctr - r, ctr + r)
