@@ -153,6 +153,34 @@ def dispay_passed_args(arguments,workingfolder):
         if (arguments['--figwth'] is not None) and (arguments['--fighgt'] is not None):
             _lg.info("You have specified figure dimensions of: "+arguments['--figwth']+', '+arguments['--fighgt'] + ' (width,height).')
 
+        if (arguments['--tstart'] is not None) and (arguments['--tdelta'] is not None):
+            _lg.info("You have specified a time start and time delta: "+arguments['--tstart']+', '+arguments['--tdelta'] )
+            try:
+                np.datetime64(arguments['--tstart'])
+            except:
+                _lg.error("You have specified a time start that numpy does not like. Please look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+                sys.exit("You have specified a time start that numpy does not like. Please look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+
+            try:
+                diff=np.timedelta64(arguments['--tdelta'].split('_')[0],arguments['--tdelta'].split('_')[1])
+            except:
+                _lg.error("You have specified a time delta that numpy does not like. Please look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+                sys.exit("You have specified a time delta that numpy does not like. Please look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+
+            try:
+                np.datetime64(arguments['--tstart'])+diff
+            except:
+                _lg.error("numpy was unable to add your timestart with your timedelta (they need to be compatible!) look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+                sys.exit("numpy was unable to add your timestart with your timedelta (they need to be compatible!) look at: http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html")
+
+        #error check to make sure both x and y variables were passed
+        if (arguments['--tstart'] is not None) and (arguments['--tdelta'] is None):
+            _lg.error("You passed tstart variable but not a tdelta variable")
+            sys.exit("You passed tstart variable but not a tdelta variable")
+        elif(arguments['--tstart'] is None) and (arguments['--tdelta'] is not None): 
+            _lg.error("You passed tdelta but not a tstart")
+            sys.exit("You passed tdelta but not a tstart")
+
         if (arguments['--x'] is not None) and (arguments['--y'] is not None):
             _lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
 
@@ -409,7 +437,13 @@ class MovMaker(object):
 
                 ax=fig.add_subplot(111)
 
-                ax.set_title(self.variable_name+' frame num is: ' +str(framecnt))
+                if (self.arguments['--tstart'] is not None) and (self.arguments['--tdelta'] is not None):
+                    diff=np.timedelta64(self.arguments['--tdelta'].split('_')[0],self.arguments['--tdelta'].split('_')[1])
+                    cdate=\
+                    str(np.datetime64(self.arguments['--tstart'])+framecnt*diff)
+                    ax.set_title(self.variable_name+' frame num is: ' +str(framecnt)+ '. Time: ' +cdate)
+                else:
+                    ax.set_title(self.variable_name+' frame num is: ' +str(framecnt))
                 #ax.set_xlabel('msg')
                 #ax.set_ylabel('msg')
 

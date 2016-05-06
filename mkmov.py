@@ -49,7 +49,7 @@ MkMov: sub-command "2d" help.
     [T1] movie of a netCDF file plotting contourf output.
 
 Usage: 
-    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -72,6 +72,8 @@ Options:
     --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     --figwth WIDTH              : figure width (nb: if you select a width then you must also specify height)
     --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
+    --tstart TSTART             : the start date, this will insert the time onto each frame (nb: if you select a tstart, you must also select a tdelta.) String will be handled by np.datetime64. See [2] for acceptable combinations.
+    --tdelta TDELTA             : the time step between each frame, this will insert the time onto each frame (nb: if you select a tdelta, you must also select a tstart.) String will be handled by np.timedelta64 (unit must match tstart), format is: 'n_F' where n is the multiple and F is the frequency, e.g. '5_D' is every five days. See [2] for acceptable options.
     --x XVARIABLE               : variable to plot on the x-axis (nb: if you specify a xvariable, you must select a yvariable.)
     --y YVARIABLE               : variable to plot on the y-axis (nb: if you specify a yvariable, you must select a xvariable.)
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
@@ -79,7 +81,11 @@ Options:
 
 References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
+    [2] http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html
 """
+
+
+    
 
 cube3d = \
 """
