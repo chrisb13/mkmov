@@ -279,12 +279,14 @@ def dispay_passed_args(arguments,workingfolder):
         _lg.info("-----------------------------------------------------------------")
     return
 
-def goplot(MovMakerClass,ax,name_of_array,zoominset=False):
+def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
     """function to loop the plotting functions so it can be called from camera and camera_hamming, would be cleaner as a class really... Still, it's an improvement over doing everything twice for camera_hamming / camera methods.
     
     :MovMakerClass: MovMaker Class with a whole bunch of needed attributes (e.g. framecnt)
     :ax: matplotlib axis to put everything on
     :name_of_array: array we are contouring..
+    :zoominset (optional): plot a zoom inset inside an axis
+    :hamming (optional): have we been called from camera_hamming?
     :returns: @todo
     """
     #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
@@ -321,6 +323,9 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False):
         if (MovMakerClass.arguments['--tstart'] is not None) and (MovMakerClass.arguments['--tdelta'] is not None):
             diff=np.timedelta64(MovMakerClass.arguments['--tdelta'].split('_')[0],MovMakerClass.arguments['--tdelta'].split('_')[1])
             if MovMakerClass.framecnt==1:
+                if not hamming:
+                    #we don't need an initial time offset if we are not hamming
+                    MovMakerClass.cidx=0
                 MovMakerClass.firstdate=np.datetime64(MovMakerClass.arguments['--tstart'])+MovMakerClass.cidx*diff
 
             cdate=str(MovMakerClass.firstdate+MovMakerClass.framecnt*diff)
@@ -763,12 +768,12 @@ class MovMaker(object):
             # ax0.set_ylabel('Transport (Sv)')
             
             ax1 = plt.subplot(gs[0,1],sharey=ax0)
-            goplot(self,ax1,name_of_array_high)
+            goplot(self,ax1,name_of_array_high,hamming=True)
 
             scf.pl_inset_title_box(ax1,'high',bwidth="10%")
 
             if self.arguments['--zoominset']:
-                goplot(self,ax1,name_of_array_high,zoominset=True)
+                goplot(self,ax1,name_of_array_high,zoominset=True,hamming=True)
             
             ax_bar = plt.subplot(gs[1,0:2])
             
