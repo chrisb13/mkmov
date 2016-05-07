@@ -616,7 +616,7 @@ class MovMaker(object):
                     _lg.info("Okay, we've shown you your plot, exiting...")
                     sys.exit("Okay, we've shown you your plot, exiting...")
             
-                fig.savefig(self.workingfolder+'/moviepar'+str(framecnt).zfill(5)+'.png',dpi=300)
+                fig.savefig(self.workingfolder+'/moviepar'+str(self.framecnt).zfill(5)+'.png',dpi=300)
                 #fig.savefig('./.pdf',format='pdf')
                 fig.clf()
                 del ax
@@ -631,11 +631,11 @@ class MovMaker(object):
             nologo=False
             for more in range(20):
                 try:
-                    os.symlink(logo,self.workingfolder+'moviepar'+str(framecnt).zfill(5)+'.png')
+                    os.symlink(logo,self.workingfolder+'moviepar'+str(self.framecnt).zfill(5)+'.png')
                 except OSError:
                     nologo=True
                     break
-                framecnt+=1
+                self.framecnt+=1
 
             if nologo:
                 #on some file systems, like some network shares,  we can't make symlinks ..
