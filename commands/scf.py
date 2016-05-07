@@ -11,6 +11,36 @@ _lg=_LogStart().setup()
 subcommand common functions (scf) used by ./subcommands
 """
 
+def pl_inset_title_box(ax,title,bwidth="20%",location=1):
+    """
+    Function that puts title of subplot in a box
+    
+    :ax:    Name of matplotlib axis to add inset title text box too
+    :title: 'string to put inside text box'
+    :returns: @todo
+    """
+    import matplotlib.pyplot as plt
+    #for inset axes
+    #hacked from:
+    #http://matplotlib.org/examples/axes_grid/inset_locator_demo.html
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes, zoomed_inset_axes
+    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+
+    axins = inset_axes(ax,
+                       width=bwidth, # width = 30% of parent_bbox
+                       height=.30, # height : 1 inch
+                       loc=location)
+
+    plt.setp(axins.get_xticklabels(), visible=False)
+    plt.setp(axins.get_yticklabels(), visible=False)
+    axins.set_xticks([])
+    axins.set_yticks([])
+
+    axins.text(0.5,0.3,title,
+            horizontalalignment='center',
+            transform=axins.transAxes,size=10)
+
+
 def mkdir_sub(p):
     """make directory of path that is passed"""
     try:

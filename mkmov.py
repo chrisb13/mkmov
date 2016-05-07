@@ -49,7 +49,7 @@ MkMov: sub-command "2d" help.
     [T1] movie of a netCDF file plotting contourf output.
 
 Usage: 
-    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --hamming HWINSIZE --crop CROPDIMS --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --hamming HWINSIZE --crop CROPDIMS --zoominset ZOOMDIMS --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --x2d XVARTWOD --y2d YVARTWOD --fixdateline --killsplash] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -75,15 +75,19 @@ Options:
     --tstart TSTART             : the start date, this will insert the time onto each frame (nb: if you select a tstart, you must also select a tdelta.) String will be handled by np.datetime64. See [2] for acceptable combinations.
     --tdelta TDELTA             : the time step between each frame, this will insert the time onto each frame (nb: if you select a tdelta, you must also select a tstart.) String will be handled by np.timedelta64 (unit must match tstart), format is: 'n_F' where n is the multiple and F is the frequency, e.g. '5_D' is every five days. See [2] for acceptable options.
     --hamming HWINSIZE          : plot low and high pass anomalies from a hamming window mean, specify window size. Must be an odd number.
-    --crop CROPDIMS             : crop plot to xmin-xmax-ymin-ymax
+    --crop CROPDIMS             : crop plot to xmin_xmax_ymin_ymax
+    --zoominset ZOOMDIMS        : zoom inset plot to xmin_xmax_ymin_ymax_loc_height_width, loc_height_width are optional, so format is xmin_xmax_ymin_ymax OR xmin_xmax_ymin_ymax_loc_height_width. loc is between 0-10, height is in inches (e.g. 1.3) and width is in percentages (e.g. 80%). See [3] for more details.
     --x XVARIABLE               : variable to plot on the x-axis (nb: if you specify a xvariable, you must select a yvariable.)
     --y YVARIABLE               : variable to plot on the y-axis (nb: if you specify a yvariable, you must select a xvariable.)
+    --x2d XVARTWOD              : variable to plot on the x-axis (nb: if you specify a xvartwod, you must select a yvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
+    --y2d YVARTWOD              : variable to plot on the y-axis (nb: if you specify a yvartwod, you must select a xvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
+    --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning: only tested on NEMO output.
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
-    --stitch                    : stitch png files together with ffmpeg (files must be the same dimensions). Use absolute not relative path.
 
 References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
     [2] http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html
+    [3] http://matplotlib.org/mpl_toolkits/axes_grid/users/overview.html (see insetLocator section) and http://stackoverflow.com/questions/10824156/matplotlib-legend-location-numbers
 """
 
 

@@ -198,9 +198,29 @@ def dispay_passed_args(arguments,workingfolder):
             _lg.info("You have said you would like to crop the plot with the following dimensions: " + \
                     arguments['--crop'])
 
-            if len(arguments['--crop'].split('-'))!=4:
+            if len(arguments['--crop'].split('_'))!=4:
                 _lg.error("You're crop argument had the wrong format, use 'xmin-xmax-ymin-ymax'.")
                 sys.exit("You're crop argument had the wrong format, use 'xmin-xmax-ymin-ymax'.")
+
+        if arguments['--zoominset']:
+            _lg.info("You have said you would like to zoominset the plot with the following specification: " + \
+                    arguments['--zoominset'])
+
+            zoominsetargs=arguments['--zoominset'].split('_')
+            if len(zoominsetargs)==4:
+                _lg.warning("You've decided to go with zoominset defaults.")
+            elif len(zoominsetargs)==7:
+                if float(zoominsetargs[4])<0 or float(zoominsetargs[4])>10:
+                    _lg.error("You've specified a loc I can't handle")
+                    sys.exit("You've specified a loc I can't handle")
+                if '%' not in zoominsetargs[6]:
+                    _lg.error("You've specified a width I can't handle")
+                    sys.exit("You've specified a width I can't handle")
+
+            else:
+                _lg.error("You've specified a zoominset I can't handle. Format needs to be: xmin_xmax_ymin_ymax OR xmin_xmax_ymin_ymax_loc_height_width.")
+                sys.exit("You've specified a zoominset I can't handle. Format needs to be: xmin_xmax_ymin_ymax OR xmin_xmax_ymin_ymax_loc_height_width.")
+
 
         if (arguments['--x'] is not None) and (arguments['--y'] is not None):
             _lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
@@ -212,6 +232,24 @@ def dispay_passed_args(arguments,workingfolder):
         elif(arguments['--x'] is None) and (arguments['--y'] is not None): 
             _lg.error("You passed yvariable but not a xvariable")
             sys.exit("You passed yvariable but not a xvariable")
+
+        if (arguments['--x2d'] is not None) and (arguments['--y2d'] is not None):
+            _lg.info("You have specified a x and yvariable for an unstructured grid: "+arguments['--x2d']+', '+arguments['--y2d'] )
+
+        #error check to make sure both x and y variables were passed
+        if (arguments['--x2d'] is not None) and (arguments['--y2d'] is None):
+            _lg.error("You passed xvariable but not a yvariable")
+            sys.exit("You passed xvariable but not a yvariable")
+        elif(arguments['--x2d'] is None) and (arguments['--y2d'] is not None): 
+            _lg.error("You passed yvariable but not a xvariable")
+            sys.exit("You passed yvariable but not a xvariable")
+
+        if arguments['--fixdateline']:
+            _lg.info("You want to fill in the land mask you specified in lmask.")
+
+            if (arguments['--x2d'] is None) and (arguments['--y2d'] is None):
+                _lg.error("This option can only be used when you have specified a --x2d and --y2d")
+                sys.exit("This option can only be used when you have specified a --x2d and --y2d")
 
         if arguments['--killsplash']:
             _lg.info("You have asked for the MkMov splash screen to NOT be displayed at the end of your movie.")
@@ -241,6 +279,101 @@ def dispay_passed_args(arguments,workingfolder):
         _lg.info("-----------------------------------------------------------------")
     return
 
+def goplot(MovMakerClass,ax,name_of_array,zoominset=False):
+    """function to loop the plotting functions so it can be called from camera and camera_hamming, would be cleaner as a class really... Still, it's an improvement over doing everything twice for camera_hamming / camera methods.
+    
+    :MovMakerClass: MovMaker Class with a whole bunch of needed attributes (e.g. framecnt)
+    :ax: matplotlib axis to put everything on
+    :name_of_array: array we are contouring..
+    :returns: @todo
+    """
+    #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
+    import matplotlib.pyplot as plt
+
+    if zoominset:
+        #sorry pep8!
+        from mpl_toolkits.axes_grid1.inset_locator import mark_inset,inset_axes
+
+        zoomargs=MovMakerClass.arguments['--zoominset'].split('_')
+        zoomargs[0:4]=map(float,zoomargs[0:4])
+        if len(zoomargs)==4:
+            axins = inset_axes(ax, height=1.3, loc=2,width="85%") 
+        elif len(zoomargs)==7:
+            # print float(zoomargs[5]), float(zoomargs[4]),zoomargs[6]
+            axins = inset_axes(ax, height=float(zoomargs[5]), loc=int(zoomargs[4]),width=zoomargs[6])
+        mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
+
+        #remove ticks
+        axins.set_xticks([])
+        axins.set_yticks([])
+
+        axins.set_xlim([zoomargs[0],zoomargs[1]])
+        axins.set_ylim([zoomargs[2],zoomargs[3]])
+
+        # make some labels invisible
+        plt.setp(axins.get_yticklabels()+axins.get_xticklabels(),
+                         visible=False)
+        
+        ax=axins
+
+    if not zoominset:
+        #do titles, add date?
+        if (MovMakerClass.arguments['--tstart'] is not None) and (MovMakerClass.arguments['--tdelta'] is not None):
+            diff=np.timedelta64(MovMakerClass.arguments['--tdelta'].split('_')[0],MovMakerClass.arguments['--tdelta'].split('_')[1])
+            if MovMakerClass.framecnt==1:
+                MovMakerClass.firstdate=np.datetime64(MovMakerClass.arguments['--tstart'])+cidx*diff
+
+            cdate=str(MovMakerClass.firstdate+MovMakerClass.framecnt*diff)
+
+            ax.set_title(MovMakerClass.variable_name+' frame num is: ' +str(MovMakerClass.framecnt)+ '. Time: ' +cdate)
+        else:
+            ax.set_title(MovMakerClass.variable_name+' frame num is: ' +str(MovMakerClass.framecnt))
+
+    if MovMakerClass.arguments['--lmask']:
+        name_of_array= np.ma.masked_where(
+            name_of_array==float(MovMakerClass.arguments['--lmask']),
+            name_of_array) 
+
+        #weird case where we have two landmasks... (i.e. MOM5_010)
+        if MovMakerClass.arguments['--lmask2']:
+            name_of_array= np.ma.masked_where(
+                name_of_array==float(MovMakerClass.arguments['--lmask2']),
+                name_of_array) 
+
+        if not MovMakerClass.arguments['--lmaskfld']:
+            #land mask...
+            cs2=ax.contour(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+        else:
+            cs2=ax.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
+
+
+    if MovMakerClass.arguments['--clev']:
+        cnt_levelnum=int(MovMakerClass.arguments['--clev'])
+    else:
+        cnt_levelnum=50
+
+    if not MovMakerClass.arguments['--cmap']:
+        MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
+                levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum))
+    else:
+        if MovMakerClass.arguments['--bcmapcentre']:
+            #will plot colourmap centred around zero
+            oldcmap=matplotlib.cm.get_cmap(MovMakerClass.arguments['--cmap'])
+            shiftd=cmap_center_point_adjust(oldcmap,[MovMakerClass.minvar,MovMakerClass.maxvar],0)
+            MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
+                    levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),\
+                    cmap=shiftd)
+        else:
+            MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
+                    levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),\
+                    cmap=MovMakerClass.arguments['--cmap'])
+
+    if MovMakerClass.arguments['--crop']:
+        axlims=[float(lim) for lim in MovMakerClass.arguments['--crop'].split('_')]
+        ax.set_xlim([axlims[0],axlims[1]])
+        ax.set_ylim([axlims[2],axlims[3]])
+
+    return 
 
 class MovMaker(object):
     """
@@ -415,6 +548,19 @@ class MovMaker(object):
             xvar=ifile.variables[self.arguments['--x']][:]
             yvar=ifile.variables[self.arguments['--y']][:]
             self.x,self.y=np.meshgrid(xvar,yvar)
+            ifile.close()
+        elif (self.arguments['--x2d'] is not None) and (self.arguments['--y2d'] is not None):
+            ifile=Dataset(self.filelist[0], 'r') #they should all be the same.
+            self.x=ifile.variables[self.arguments['--x2d']][:]
+
+            if self.arguments['--fixdateline']:
+                #fix the dateline
+                for index in np.arange(np.shape(self.x)[0]):
+                    start=np.where(np.sign(self.x[index,:])==-1)[0][0]
+                    self.x[index,start:]=self.x[index,start:]+360
+
+            self.y=ifile.variables[self.arguments['--y2d']][:]
+            ifile.close()
         else:
             ifile=Dataset(self.filelist[0], 'r')
             name_of_array=self.getdata(ifile)
@@ -435,7 +581,7 @@ class MovMaker(object):
 
         _lg.info("Camera! Creating your plots...")
 
-        framecnt=1
+        self.framecnt=1
 
         #might have been leaking memory? 
         plt.close('all')
@@ -456,66 +602,14 @@ class MovMaker(object):
                 sys.exit("Your time dimension wasn't in the first dimension, MkMov doesn't know what to do with this kind of file.")
 
             for tstep in np.arange(np.shape(name_of_array)[self.timedim]):
-                _lg.debug("Working timestep: " + str(framecnt)+ " frames in: " +self.workingfolder)
+                _lg.debug("Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
 
                 ax=fig.add_subplot(111)
 
-                if (self.arguments['--tstart'] is not None) and (self.arguments['--tdelta'] is not None):
-                    diff=np.timedelta64(self.arguments['--tdelta'].split('_')[0],self.arguments['--tdelta'].split('_')[1])
-                    cdate=\
-                    str(np.datetime64(self.arguments['--tstart'])+framecnt*diff)
-                    ax.set_title(self.variable_name+' frame num is: ' +str(framecnt)+ '. Time: ' +cdate)
-                else:
-                    ax.set_title(self.variable_name+' frame num is: ' +str(framecnt))
-                #ax.set_xlabel('msg')
-                #ax.set_ylabel('msg')
+                goplot(self,ax,name_of_array[tstep])
 
-                if self.arguments['--lmask']:
-                    name_of_array= np.ma.masked_where(
-                        name_of_array==float(self.arguments['--lmask']),
-                        name_of_array) 
-
-                    #weird case where we have two landmasks... (i.e. MOM5_010)
-                    if self.arguments['--lmask2']:
-                        name_of_array= np.ma.masked_where(
-                            name_of_array==float(self.arguments['--lmask2']),
-                            name_of_array) 
-
-                    if not self.arguments['--lmaskfld']:
-                        #land mask...
-                        cs2=ax.contour(self.x,self.y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
-                    else:
-                        cs2=ax.contourf(self.x,self.y,name_of_array[tstep,:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
-
-                if self.arguments['--clev']:
-                    cnt_levelnum=int(self.arguments['--clev'])
-                else:
-                    cnt_levelnum=50
-
-                if not self.arguments['--cmap']:
-                    cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
-                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
-                else:
-
-                    if self.arguments['--bcmapcentre']:
-                        #will plot colourmap centred around zero
-                        oldcmap=matplotlib.cm.get_cmap(self.arguments['--cmap'])
-                        shiftd=cmap_center_point_adjust(oldcmap,[self.minvar,self.maxvar],0)
-                        cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
-                                levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
-                                cmap=shiftd)
-                    else:
-                        cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
-                                levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
-                                cmap=self.arguments['--cmap'])
-
-                plt.colorbar(cs1)
-                #plt.show()
-
-                if self.arguments['--crop']:
-                    axlims=[float(lim) for lim in self.arguments['--crop'].split('-')]
-                    ax.set_xlim([axlims[0],axlims[1]])
-                    ax.set_ylim([axlims[2],axlims[3]])
+                if self.arguments['--zoominset']:
+                    goplot(self,ax,name_of_array[tstep],zoominset=True)
 
                 if plotpreview:
                     plt.show()
@@ -526,7 +620,7 @@ class MovMaker(object):
                 #fig.savefig('./.pdf',format='pdf')
                 fig.clf()
                 del ax
-                framecnt+=1
+                self.framecnt+=1
 
             ifile.close()
 
@@ -594,72 +688,6 @@ class MovMaker(object):
 
             return
 
-        def goplot(ax,name_of_array):
-            """function to loop the plotting functions so we don't have to write it twice, this should be re-factored so we only have to maintain one set of these!
-            
-            :ax: @todo
-            :name_of_array: @todo
-            :returns: @todo
-            """
-        
-            if (self.arguments['--tstart'] is not None) and (self.arguments['--tdelta'] is not None):
-                diff=np.timedelta64(self.arguments['--tdelta'].split('_')[0],self.arguments['--tdelta'].split('_')[1])
-                if framecnt==1:
-                    self.firstdate=np.datetime64(self.arguments['--tstart'])+cidx*diff
-
-                cdate=str(self.firstdate+framecnt*diff)
-
-                ax.set_title(self.variable_name+' frame num is: ' +str(framecnt)+ '. Time: ' +cdate)
-            else:
-                ax.set_title(self.variable_name+' frame num is: ' +str(framecnt))
-
-            if self.arguments['--lmask']:
-                name_of_array= np.ma.masked_where(
-                    name_of_array==float(self.arguments['--lmask']),
-                    name_of_array) 
-
-                #weird case where we have two landmasks... (i.e. MOM5_010)
-                if self.arguments['--lmask2']:
-                    name_of_array= np.ma.masked_where(
-                        name_of_array==float(self.arguments['--lmask2']),
-                        name_of_array) 
-
-                if not self.arguments['--lmaskfld']:
-                    #land mask...
-                    cs2=ax.contour(self.x,self.y,name_of_array[:,:].mask,levels=[-1,0],linewidths=1,colors='black')
-                else:
-                    cs2=ax.contourf(self.x,self.y,name_of_array[:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
-
-
-            if self.arguments['--clev']:
-                cnt_levelnum=int(self.arguments['--clev'])
-            else:
-                cnt_levelnum=50
-
-            if not self.arguments['--cmap']:
-                self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
-                        levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
-            else:
-
-                if self.arguments['--bcmapcentre']:
-                    #will plot colourmap centred around zero
-                    oldcmap=matplotlib.cm.get_cmap(self.arguments['--cmap'])
-                    shiftd=cmap_center_point_adjust(oldcmap,[self.minvar,self.maxvar],0)
-                    self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
-                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
-                            cmap=shiftd)
-                else:
-                    self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
-                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
-                            cmap=self.arguments['--cmap'])
-
-            if self.arguments['--crop']:
-                axlims=[float(lim) for lim in self.arguments['--crop'].split('-')]
-                ax.set_xlim([axlims[0],axlims[1]])
-                ax.set_ylim([axlims[2],axlims[3]])
-
-            return 
-
         g_tstep_nfo()
 
         #calculate mean -- serious memory abuse! (Should probably use Dask..)
@@ -686,9 +714,9 @@ class MovMaker(object):
 
         gs = gridspec.GridSpec(2, 2,height_ratios=[15,1],hspace=.225,wspace=0.065)
 
-        framecnt=1
+        self.framecnt=1
         for tchunk in self.dfloop:
-            _lg.debug("Working timestep: " + str(framecnt)+ " frames in: " +self.workingfolder)
+            _lg.debug("Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
             df=self.df.iloc[tchunk]
 
             means=[]
@@ -725,12 +753,22 @@ class MovMaker(object):
            
             ax0 = plt.subplot(gs[0,0])
 
-            goplot(ax0,name_of_array)
+            goplot(self,ax0,name_of_array)
+
+            if self.arguments['--zoominset']:
+                goplot(self,ax0,name_of_array,zoominset=True)
+
+            scf.pl_inset_title_box(ax0,'low',bwidth="10%")
             #ax0.set_title('Crossing at 30 S')
             # ax0.set_ylabel('Transport (Sv)')
             
             ax1 = plt.subplot(gs[0,1],sharey=ax0)
-            goplot(ax1,name_of_array_high)
+            goplot(self,ax1,name_of_array_high)
+
+            scf.pl_inset_title_box(ax1,'high',bwidth="10%")
+
+            if self.arguments['--zoominset']:
+                goplot(self,ax1,name_of_array_high,zoominset=True)
             
             ax_bar = plt.subplot(gs[1,0:2])
             
@@ -740,17 +778,15 @@ class MovMaker(object):
             plt.setp(ax1.get_yticklabels(),
                              visible=False)
 
-            # plt.show()
-
             if plotpreview:
                 plt.show()
                 # _lg.info("Okay, we've shown you your plot, exiting...")
                 # sys.exit("Okay, we've shown you your plot, exiting...")
         
-            fig.savefig(self.workingfolder+'/moviepar'+str(framecnt).zfill(5)+'.png',dpi=300)
+            fig.savefig(self.workingfolder+'/moviepar'+str(self.framecnt).zfill(5)+'.png',dpi=300)
             fig.clf()
             del ax0,ax1,ax_bar
-            framecnt+=1
+            self.framecnt+=1
         return
 
 
