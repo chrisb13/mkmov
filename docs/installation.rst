@@ -11,6 +11,8 @@ MkMov requires:
 * numpy
 * netCDF4
 * ffmpeg
+* NCO tools (optional, needed for 2d --bias options)
+* pandas (optional, needed for 2d --hamming)
 
 *If you already have these installed, skip to the usage section.*
 
