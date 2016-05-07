@@ -321,7 +321,7 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False):
         if (MovMakerClass.arguments['--tstart'] is not None) and (MovMakerClass.arguments['--tdelta'] is not None):
             diff=np.timedelta64(MovMakerClass.arguments['--tdelta'].split('_')[0],MovMakerClass.arguments['--tdelta'].split('_')[1])
             if MovMakerClass.framecnt==1:
-                MovMakerClass.firstdate=np.datetime64(MovMakerClass.arguments['--tstart'])+cidx*diff
+                MovMakerClass.firstdate=np.datetime64(MovMakerClass.arguments['--tstart'])+MovMakerClass.cidx*diff
 
             cdate=str(MovMakerClass.firstdate+MovMakerClass.framecnt*diff)
 
@@ -747,9 +747,9 @@ class MovMaker(object):
 
             ham=np.hamming(int(self.arguments['--hamming']))
             name_of_array=np.mean([ham[h]*means[h,:,:] for h in np.arange(len(ham))],axis=0)
-            cidx=np.where(ham==1)[0][0]
+            self.cidx=np.where(ham==1)[0][0]
 
-            name_of_array_high=means[cidx]-name_of_array
+            name_of_array_high=means[self.cidx]-name_of_array
            
             ax0 = plt.subplot(gs[0,0])
 
