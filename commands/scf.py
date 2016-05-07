@@ -11,6 +11,18 @@ _lg=_LogStart().setup()
 subcommand common functions (scf) used by ./subcommands
 """
 
+def mkdir_sub(p):
+    """make directory of path that is passed"""
+    try:
+       os.makedirs(p)
+       _lg.info("output folder: "+p+ " does not exist, we will make one.")
+    except OSError as exc: # Python >2.5
+       import errno
+       if exc.errno == errno.EEXIST and os.path.isdir(p):
+          pass
+       else: raise
+
+
 def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
     """function that actually calls ffmpeg to stitch all the png together
     

@@ -49,7 +49,7 @@ MkMov: sub-command "2d" help.
     [T1] movie of a netCDF file plotting contourf output.
 
 Usage: 
-    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --hamming HWINSIZE --crop CROPDIMS --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --killsplash] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -74,6 +74,8 @@ Options:
     --fighgt HEIGHT             : figure height (nb: if you select a height then you must also specify width)
     --tstart TSTART             : the start date, this will insert the time onto each frame (nb: if you select a tstart, you must also select a tdelta.) String will be handled by np.datetime64. See [2] for acceptable combinations.
     --tdelta TDELTA             : the time step between each frame, this will insert the time onto each frame (nb: if you select a tdelta, you must also select a tstart.) String will be handled by np.timedelta64 (unit must match tstart), format is: 'n_F' where n is the multiple and F is the frequency, e.g. '5_D' is every five days. See [2] for acceptable options.
+    --hamming HWINSIZE          : plot low and high pass anomalies from a hamming window mean, specify window size. Must be an odd number.
+    --crop CROPDIMS             : crop plot to xmin-xmax-ymin-ymax
     --x XVARIABLE               : variable to plot on the x-axis (nb: if you specify a xvariable, you must select a yvariable.)
     --y YVARIABLE               : variable to plot on the y-axis (nb: if you specify a yvariable, you must select a xvariable.)
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
@@ -199,8 +201,11 @@ if __name__ == "__main__":
         movmk=sc.MovMaker(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
 
         #aah I've always wanted to say this!
-        movmk.lights()
-        movmk.camera(minvar=arguments['--min'],maxvar=arguments['--max'],plotpreview=arguments['--preview'])
+        movmk.lights(minvar=arguments['--min'],maxvar=arguments['--max'])
+        if not arguments['--hamming']:
+            movmk.camera(plotpreview=arguments['--preview'])
+        else:
+            movmk.camera_hamming(plotpreview=arguments['--preview'])
         movmk.action()
         # movmk.cleanup()
 

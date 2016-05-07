@@ -2,6 +2,7 @@ import sys
 import os
 from netCDF4 import Dataset
 import numpy as np
+import subprocess
 
 # sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -181,6 +182,26 @@ def dispay_passed_args(arguments,workingfolder):
             _lg.error("You passed tdelta but not a tstart")
             sys.exit("You passed tdelta but not a tstart")
 
+        if arguments['--hamming']:
+            if np.mod(int(arguments['--hamming']),2)!=1:
+                _lg.error("You have specified a hamming window that is not an odd number.")
+                sys.exit("You have specified a hamming window that is not an odd number.")
+
+            # if not arguments['--bias']:
+                # _lg.error("If using a hamming window you need to also specify bias.")
+                # sys.exit("If using a hamming window you need to also specify bias.")
+
+            _lg.info("You have said you would like to plot both high and low pass anomalies from a hamming window: " + \
+                    str(arguments['--hamming']))
+
+        if arguments['--crop']:
+            _lg.info("You have said you would like to crop the plot with the following dimensions: " + \
+                    arguments['--crop'])
+
+            if len(arguments['--crop'].split('-'))!=4:
+                _lg.error("You're crop argument had the wrong format, use 'xmin-xmax-ymin-ymax'.")
+                sys.exit("You're crop argument had the wrong format, use 'xmin-xmax-ymin-ymax'.")
+
         if (arguments['--x'] is not None) and (arguments['--y'] is not None):
             _lg.info("You have specified a x and yvariable: "+arguments['--x']+', '+arguments['--y'] )
 
@@ -251,7 +272,18 @@ class MovMaker(object):
         self.workingfolder=workingfolder
         self.arguments=argu
 
-    def lights(self):
+    def getdata(self,ifile):
+        """function that grabs the data
+        :returns: nparray
+        """
+        if self.var_len==4:
+            var_nparray=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
+        else:
+            var_nparray=ifile.variables[self.variable_name][:]
+    
+        return var_nparray
+
+    def lights(self,minvar=None,maxvar=None):
         """function to do some sanity checks on the files and find out where the time dim is.
         
         """
@@ -261,20 +293,20 @@ class MovMaker(object):
         #create bias files
         if self.arguments['--bias']:
             #following example in http://linux.die.net/man/1/ncdiff
-            ncout='ncra '+' '.join(self.filelist)+' '+workingfol+'mean.nc'
+            ncout='ncra '+' '.join(self.filelist)+' '+self.workingfolder+'mean.nc'
             _lg.info("Creating mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
-            ncout='ncwa -O -a '+self.arguments['--bias']+' '+workingfol+'mean.nc '+workingfol+'mean_notime.nc'
+            ncout='ncwa -O -a '+self.arguments['--bias']+' '+self.workingfolder+'mean.nc '+self.workingfolder+'mean_notime.nc'
             _lg.info("Removing time dimension from mean file: " + ncout)
             subprocess.call(ncout,shell=True)
 
-            difffol=workingfol+'difffiles/'
-            mkdir(workingfol+'difffiles/')
+            difffol=self.workingfolder+'difffiles/'
+            scf.mkdir_sub(self.workingfolder+'difffiles/')
             newfilelist=[]
             cnt=0
             for f in self.filelist:
-                ncout='ncdiff '+' '+f+' '+workingfol+'mean_notime.nc '+difffol+os.path.basename(f)[:-3]+'_diff_'+str(cnt).zfill(5)+'.nc'
+                ncout='ncdiff '+' '+f+' '+self.workingfolder+'mean_notime.nc '+difffol+os.path.basename(f)[:-3]+'_diff_'+str(cnt).zfill(5)+'.nc'
                 _lg.info("Creating anomaly file: " + ncout)
                 subprocess.call(ncout,shell=True)
                 newfilelist.append(difffol+os.path.basename(f)[:-3]+'_diff_'+str(cnt).zfill(5)+'.nc')
@@ -357,29 +389,6 @@ class MovMaker(object):
         else:
             _lg.error("(Unlimited) 'time' dimension was not the same across all files, fatal error.")
             sys.exit("(Unlimited) 'time' dimension was not the same across all files, fatal error.")
-        return
-        
-    def camera(self,minvar=None,maxvar=None,plotpreview=False):
-        """function to create plots.
-        
-        :workingfolder: @todo
-        :returns: @todo
-        """
-        #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
-        import matplotlib.pyplot as plt
-
-        def getdata():
-            """function that grabs the data
-            :returns: nparray
-            """
-            if self.var_len==4:
-                var_nparray=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
-            else:
-                var_nparray=ifile.variables[self.variable_name][:]
-        
-            return var_nparray
-
-        _lg.info("Camera! Creating your plots...")
 
         #get max and min values for timeseries. This is expensive :(
         if (minvar is None) and (maxvar is None):
@@ -387,7 +396,7 @@ class MovMaker(object):
             maxs=[]
             for f in self.filelist:
                 ifile=Dataset(f, 'r')
-                name_of_array=getdata()
+                name_of_array=self.getdata(ifile)
 
                 mins.append(np.min(name_of_array))
                 maxs.append(np.max(name_of_array))
@@ -401,31 +410,45 @@ class MovMaker(object):
             self.minvar=float(minvar)
             self.maxvar=float(maxvar)
 
+        if (self.arguments['--x'] is not None) and (self.arguments['--y'] is not None):
+            ifile=Dataset(self.filelist[0], 'r') #they should all be the same.
+            xvar=ifile.variables[self.arguments['--x']][:]
+            yvar=ifile.variables[self.arguments['--y']][:]
+            self.x,self.y=np.meshgrid(xvar,yvar)
+        else:
+            ifile=Dataset(self.filelist[0], 'r')
+            name_of_array=self.getdata(ifile)
+            self.x,self.y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),\
+                    np.arange(np.shape(name_of_array)[self.timedim+1]))
+            ifile.close()
+
+        return
+        
+    def camera(self,plotpreview=False):
+        """function to create plots.
+        
+        :workingfolder: @todo
+        :returns: @todo
+        """
+        #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
+        import matplotlib.pyplot as plt
+
+        _lg.info("Camera! Creating your plots...")
+
         framecnt=1
+
+        #might have been leaking memory? 
+        plt.close('all')
+
+        if (self.arguments['--figwth'] is not None) and (self.arguments['--fighgt'] is not None):
+            #width then height
+            fig=plt.figure(figsize=(float(self.arguments['--figwth']),float(self.arguments['--fighgt'])))
+        else:
+            fig=plt.figure()
+
         for f in self.filelist:
             ifile=Dataset(f, 'r')
-            name_of_array=getdata()
-
-            plt.close('all')
-
-            if (self.arguments['--figwth'] is not None) and (self.arguments['--fighgt'] is not None):
-                #width then height
-                fig=plt.figure(figsize=(float(self.arguments['--figwth']),float(self.arguments['--fighgt'])))
-            else:
-                fig=plt.figure()
-
-            #not ideal really, this thing being in the loop
-            if (self.arguments['--x'] is not None) and (self.arguments['--y'] is not None):
-                ifile=Dataset(f, 'r')
-                xvar=ifile.variables[self.arguments['--x']][:]
-                yvar=ifile.variables[self.arguments['--y']][:]
-                x,y=np.meshgrid(xvar,yvar)
-            else:
-                x,y=np.meshgrid(np.arange(np.shape(name_of_array)[self.timedim+2]),\
-                        np.arange(np.shape(name_of_array)[self.timedim+1]))
-
-            minvar=np.min(name_of_array)
-            maxvar=np.max(name_of_array)
+            name_of_array=self.getdata(ifile)
 
             #h'm the following loop has a problem, because if tstep isn't in dim 0 we are screwed! (probably needs some fancy syntax to slice out of name_of_array (hard without google)
             if self.timedim!=0:
@@ -460,10 +483,9 @@ class MovMaker(object):
 
                     if not self.arguments['--lmaskfld']:
                         #land mask...
-                        cs2=ax.contour(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+                        cs2=ax.contour(self.x,self.y,name_of_array[tstep,:,:].mask,levels=[-1,0],linewidths=1,colors='black')
                     else:
-                        cs2=ax.contourf(x,y,name_of_array[tstep,:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
-
+                        cs2=ax.contourf(self.x,self.y,name_of_array[tstep,:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
 
                 if self.arguments['--clev']:
                     cnt_levelnum=int(self.arguments['--clev'])
@@ -471,7 +493,7 @@ class MovMaker(object):
                     cnt_levelnum=50
 
                 if not self.arguments['--cmap']:
-                    cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                    cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
                             levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
                 else:
 
@@ -479,17 +501,21 @@ class MovMaker(object):
                         #will plot colourmap centred around zero
                         oldcmap=matplotlib.cm.get_cmap(self.arguments['--cmap'])
                         shiftd=cmap_center_point_adjust(oldcmap,[self.minvar,self.maxvar],0)
-                        cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                        cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
                                 levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
                                 cmap=shiftd)
                     else:
-                        cs1=plt.contourf(x,y,name_of_array[tstep,:,:],\
+                        cs1=plt.contourf(self.x,self.y,name_of_array[tstep,:,:],\
                                 levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
                                 cmap=self.arguments['--cmap'])
 
-
                 plt.colorbar(cs1)
                 #plt.show()
+
+                if self.arguments['--crop']:
+                    axlims=[float(lim) for lim in self.arguments['--crop'].split('-')]
+                    ax.set_xlim([axlims[0],axlims[1]])
+                    ax.set_ylim([axlims[2],axlims[3]])
 
                 if plotpreview:
                     plt.show()
@@ -520,6 +546,212 @@ class MovMaker(object):
             if nologo:
                 #on some file systems, like some network shares,  we can't make symlinks ..
                 _lg.warning("Couldn't insert the logo at the end, sorry!")
+
+
+    def camera_hamming(self,minvar=None,maxvar=None,plotpreview=False):
+        """function to create plots with a hamming filter.
+        
+        :workingfolder: @todo
+        :returns: @todo
+
+        Notes
+        -------
+        Unfortunately, had to replicate a bunch of code here. Tried to move a bunch of it to lights() function. It was going to be too unreadable otherwise (as we don't loop through all the files in the same way).
+        """
+        #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
+        import matplotlib.pyplot as plt
+        from matplotlib import gridspec
+        import pandas as pd
+        
+        def g_tstep_nfo():
+            """@todo: Docstring for g_tstep_nfo
+            :returns: @todo
+            """
+            dfsteps=[]
+            tsteps=[]
+            flist=[]
+            for f in self.filelist:
+                ifile=Dataset(f, 'r')
+                if self.var_len==4:
+                    var_nparray=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
+                else:
+                    var_nparray=ifile.variables[self.variable_name][:]
+
+                for tstep in np.arange(var_nparray.shape[0]):
+                    dfsteps.append(var_nparray.shape[0])
+                    tsteps.append(tstep)
+                    flist.append(f)
+                ifile.close()
+            self.df=pd.DataFrame({'fname':flist,'tsteps':dfsteps,'tstep':tsteps})
+            window=int(self.arguments['--hamming'])
+            end=self.df.index[-1]
+            self.dfloop=[(range(0,window)+z).tolist() for z in np.arange(end-window+2)]
+
+            if (self.arguments['--tstart'] is not None) and (self.arguments['--tdelta'] is not None):
+                diff=np.timedelta64(self.arguments['--tdelta'].split('_')[0],self.arguments['--tdelta'].split('_')[1])
+                self.df['time']=\
+                [np.datetime64(self.arguments['--tstart'])+step*diff for step in np.arange(len(self.df))]
+
+            return
+
+        def goplot(ax,name_of_array):
+            """function to loop the plotting functions so we don't have to write it twice, this should be re-factored so we only have to maintain one set of these!
+            
+            :ax: @todo
+            :name_of_array: @todo
+            :returns: @todo
+            """
+        
+            if (self.arguments['--tstart'] is not None) and (self.arguments['--tdelta'] is not None):
+                diff=np.timedelta64(self.arguments['--tdelta'].split('_')[0],self.arguments['--tdelta'].split('_')[1])
+                if framecnt==1:
+                    self.firstdate=np.datetime64(self.arguments['--tstart'])+cidx*diff
+
+                cdate=str(self.firstdate+framecnt*diff)
+
+                ax.set_title(self.variable_name+' frame num is: ' +str(framecnt)+ '. Time: ' +cdate)
+            else:
+                ax.set_title(self.variable_name+' frame num is: ' +str(framecnt))
+
+            if self.arguments['--lmask']:
+                name_of_array= np.ma.masked_where(
+                    name_of_array==float(self.arguments['--lmask']),
+                    name_of_array) 
+
+                #weird case where we have two landmasks... (i.e. MOM5_010)
+                if self.arguments['--lmask2']:
+                    name_of_array= np.ma.masked_where(
+                        name_of_array==float(self.arguments['--lmask2']),
+                        name_of_array) 
+
+                if not self.arguments['--lmaskfld']:
+                    #land mask...
+                    cs2=ax.contour(self.x,self.y,name_of_array[:,:].mask,levels=[-1,0],linewidths=1,colors='black')
+                else:
+                    cs2=ax.contourf(self.x,self.y,name_of_array[:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
+
+
+            if self.arguments['--clev']:
+                cnt_levelnum=int(self.arguments['--clev'])
+            else:
+                cnt_levelnum=50
+
+            if not self.arguments['--cmap']:
+                self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
+                        levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum))
+            else:
+
+                if self.arguments['--bcmapcentre']:
+                    #will plot colourmap centred around zero
+                    oldcmap=matplotlib.cm.get_cmap(self.arguments['--cmap'])
+                    shiftd=cmap_center_point_adjust(oldcmap,[self.minvar,self.maxvar],0)
+                    self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
+                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
+                            cmap=shiftd)
+                else:
+                    self.cs1=plt.contourf(self.x,self.y,name_of_array[:,:],\
+                            levels=np.linspace(self.minvar,self.maxvar,cnt_levelnum),\
+                            cmap=self.arguments['--cmap'])
+
+            if self.arguments['--crop']:
+                axlims=[float(lim) for lim in self.arguments['--crop'].split('-')]
+                ax.set_xlim([axlims[0],axlims[1]])
+                ax.set_ylim([axlims[2],axlims[3]])
+
+            return 
+
+        g_tstep_nfo()
+
+        #calculate mean -- serious memory abuse! (Should probably use Dask..)
+        if not self.arguments['--bias']:
+            means=[]
+            for f in self.df['fname'].drop_duplicates().values:
+                ifile=Dataset(f, 'r')
+                if self.var_len==4:
+                    sliicevar=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
+                else:
+                    slicevar=ifile.variables[self.variable_name][:]
+                means.append(slicevar)
+                ifile.close()
+            means=np.vstack(means)
+            self.mean=np.mean(means,axis=0)
+
+        plt.close('all') 
+
+        if (self.arguments['--figwth'] is not None) and (self.arguments['--fighgt'] is not None):
+            #width then height
+            fig=plt.figure(figsize=(float(self.arguments['--figwth']),float(self.arguments['--fighgt'])))
+        else:
+            fig=plt.figure()
+
+        gs = gridspec.GridSpec(2, 2,height_ratios=[15,1],hspace=.225,wspace=0.065)
+
+        framecnt=1
+        for tchunk in self.dfloop:
+            _lg.debug("Working timestep: " + str(framecnt)+ " frames in: " +self.workingfolder)
+            df=self.df.iloc[tchunk]
+
+            means=[]
+            for filepath,group in  df.groupby('fname'):
+                # print filepath
+
+                filenc=Dataset(filepath, 'r')
+
+                if self.var_len==4:
+                    slicevar=\
+                    filenc.variables[self.variable_name]\
+                                [group['tstep'].iloc[0]:group['tstep'].iloc[-1]+1,\
+                                self.depthlvl,:,:]
+                else:
+                    slicevar=\
+                    filenc.variables[self.variable_name][group['tstep'].iloc[0]:group['tstep'].iloc[-1]+1]
+
+                # print 'shape of slice',np.shape(slicevar)
+                #interesting you can just have [tidx,:] don't necessarily need [tidx,:,:]
+                means.append(\
+                slicevar
+                )
+                filenc.close()
+
+            means=np.vstack(means)
+            if not self.arguments['--bias']:
+                means=means-self.mean
+
+            ham=np.hamming(int(self.arguments['--hamming']))
+            name_of_array=np.mean([ham[h]*means[h,:,:] for h in np.arange(len(ham))],axis=0)
+            cidx=np.where(ham==1)[0][0]
+
+            name_of_array_high=means[cidx]-name_of_array
+           
+            ax0 = plt.subplot(gs[0,0])
+
+            goplot(ax0,name_of_array)
+            #ax0.set_title('Crossing at 30 S')
+            # ax0.set_ylabel('Transport (Sv)')
+            
+            ax1 = plt.subplot(gs[0,1],sharey=ax0)
+            goplot(ax1,name_of_array_high)
+            
+            ax_bar = plt.subplot(gs[1,0:2])
+            
+            plt.colorbar(self.cs1,cax=ax_bar,orientation='horizontal')
+
+            # make some labels invisible
+            plt.setp(ax1.get_yticklabels(),
+                             visible=False)
+
+            # plt.show()
+
+            if plotpreview:
+                plt.show()
+                # _lg.info("Okay, we've shown you your plot, exiting...")
+                # sys.exit("Okay, we've shown you your plot, exiting...")
+        
+            fig.savefig(self.workingfolder+'/moviepar'+str(framecnt).zfill(5)+'.png',dpi=300)
+            fig.clf()
+            del ax0,ax1,ax_bar
+            framecnt+=1
+        return
 
 
     def action(self):

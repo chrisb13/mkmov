@@ -40,6 +40,11 @@ def check_dependencies():
         _lg.error("You don't have the numpy library!")
         sys.exit("You don't have the numpy library!")
 
+    try:
+        imp.find_module('pandas')
+    except ImportError:
+        _lg.warning("You don't have the (optional) Pandas library. Needed for hamming filter.")
+
     #This is the error message if ffmpeg is not installed...
     #The program 'ffmpeg' is currently not installed.  You can install it by typing:
         #sudo apt-get install libav-tools
