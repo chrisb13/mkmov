@@ -2,6 +2,8 @@ import os
 import subprocess
 import glob
 import numpy as np
+import shutil
+import sys
 
 from ._scf import _LogStart
 _lg=_LogStart().setup()
@@ -94,13 +96,19 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
         if os.path.isfile(pngfolder+'movie.mov'):
             _lg.info("MkMov SUCCESS, check it out: "+pngfolder+'movie.mov')
 
+            sys.exit(0)
+
         if outputdir:
             if os.path.isfile(outputdir):
+                _lg.info("Removing working folder: "+pngfolder)
+                shutil.rmtree(pngfolder)
                 _lg.info("MkMov SUCCESS, check it out: "+outputdir)
+
+                sys.exit(0)
     else:
         _lg.info("MkMov FAIL")
         _lg.error("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
-        sys.exit("Something went wrong with ffmpeg, it hasn't made a movie :( We won't delete the plots.")
+        sys.exit(1)
 
 def axisEqual3D(ax):
     """

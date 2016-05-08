@@ -619,7 +619,9 @@ class MovMaker(object):
                 if plotpreview:
                     plt.show()
                     _lg.info("Okay, we've shown you your plot, exiting...")
-                    sys.exit("Okay, we've shown you your plot, exiting...")
+                    if self.arguments['-o']:
+                        subprocess.call('rm -r '+self.workingfolder,shell=True)
+                    sys.exit(0)
             
                 fig.savefig(self.workingfolder+'/moviepar'+str(self.framecnt).zfill(5)+'.png',dpi=300)
                 #fig.savefig('./.pdf',format='pdf')
@@ -785,6 +787,11 @@ class MovMaker(object):
 
             if plotpreview:
                 plt.show()
+
+                _lg.info("Okay, we've shown you your plot, exiting...")
+                if self.arguments['-o']:
+                    subprocess.call('rm -r '+self.workingfolder,shell=True)
+                sys.exit(0)
                 # _lg.info("Okay, we've shown you your plot, exiting...")
                 # sys.exit("Okay, we've shown you your plot, exiting...")
         
