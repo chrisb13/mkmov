@@ -97,7 +97,7 @@ class _LogStart(object):
 if __name__ == "__main__":                                     #are we being run directly?
    lg=_LogStart().setup()
    #lg=meh.go()
-   print __name__
+   # print __name__
 
    #LogStart(args.inputdir+'asciplot_lc_katana'+args.fno + '.log',fout=True)
    lg.info('moo')
