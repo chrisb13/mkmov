@@ -3,6 +3,8 @@ import os
 from netCDF4 import Dataset
 import numpy as np
 import subprocess
+import math
+import copy
 
 # sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -41,6 +43,8 @@ def cmap_center_point_adjust(cmap, range, center):
 
         newcmap = oldcmap**a
         '''
+        #sorry again but travis and pep8 don't mix!
+        import matplotlib
         if a < 0.:
             return cmap
         cdict = copy.copy(cmap._segmentdata)
@@ -50,7 +54,7 @@ def cmap_center_point_adjust(cmap, range, center):
             cdict[key].sort()
             assert (cdict[key][0]<0 or cdict[key][-1]>1), \
                 "Resulting indices extend out of the [0, 1] segment."
-        return colors.LinearSegmentedColormap('colormap',cdict,1024)
+        return matplotlib.colors.LinearSegmentedColormap('colormap',cdict,1024)
 
     if not ((range[0] < center) and (center < range[1])):
         return cmap
@@ -291,6 +295,7 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
     """
     #this is poor form, violates pep8! but means we can pick a backend for travis-ci testing...
     import matplotlib.pyplot as plt
+    import matplotlib
 
     if zoominset:
         #sorry pep8!
@@ -561,6 +566,10 @@ class MovMaker(object):
             if self.arguments['--fixdateline']:
                 #fix the dateline
                 for index in np.arange(np.shape(self.x)[0]):
+                    if len(np.where(np.sign(self.x[index,:])==-1)[0])==0:
+                        _lg.warning("MkMov couldn't find your dateline, skipping the 'fix'.")
+                        break
+
                     start=np.where(np.sign(self.x[index,:])==-1)[0][0]
                     self.x[index,start:]=self.x[index,start:]+360
 
