@@ -6,6 +6,11 @@ import subprocess
 import math
 import copy
 
+#for multiple plots
+#from:http://stackoverflow.com/questions/18266642/multiple-imshow-subplots-each-with-colorbar 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.ticker import MultipleLocator
+
 # sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from ._twod import _LogStart
@@ -383,7 +388,12 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
                     cmap=MovMakerClass.arguments['--cmap'])
 
     if not hamming and not zoominset:
-        plt.colorbar(MovMakerClass.cs1,orientation='horizontal')
+        # Create divider for existing axes instance
+        divider = make_axes_locatable(ax)
+        caxis = divider.append_axes("bottom", size="5%", pad=0.25)
+        
+        plt.colorbar(MovMakerClass.cs1,cax=caxis,orientation='horizontal')
+        # plt.colorbar(MovMakerClass.cs1,orientation='horizontal')
 
     if MovMakerClass.arguments['--crop']:
         axlims=[float(lim) for lim in MovMakerClass.arguments['--crop'].split('_')]
