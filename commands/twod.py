@@ -340,14 +340,19 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
             ax.set_title(MovMakerClass.variable_name+' frame num is: ' +str(MovMakerClass.framecnt))
 
     if MovMakerClass.arguments['--lmask']:
+        if hamming:
+            maskdarray=MovMakerClass.cidxarray
+        else:
+            maskdarray=name_of_array
+
         name_of_array= np.ma.masked_where(
-            name_of_array==float(MovMakerClass.arguments['--lmask']),
+            maskdarray==float(MovMakerClass.arguments['--lmask']),
             name_of_array) 
 
         #weird case where we have two landmasks... (i.e. MOM5_010)
         if MovMakerClass.arguments['--lmask2']:
             name_of_array= np.ma.masked_where(
-                name_of_array==float(MovMakerClass.arguments['--lmask2']),
+                maskdarray==float(MovMakerClass.arguments['--lmask2']),
                 name_of_array) 
 
         if not MovMakerClass.arguments['--lmaskfld']:
@@ -704,6 +709,11 @@ class MovMaker(object):
                 self.df['time']=\
                 [np.datetime64(self.arguments['--tstart'])+step*diff for step in np.arange(len(self.df))]
 
+            #hamming error trap
+            if len(self.df)<int(self.arguments['--hamming']):
+                _lg.error("You've specified too big a hamming window for the number of time steps available.")
+                sys.exit(1)
+
             return
 
         g_tstep_nfo()
@@ -764,17 +774,21 @@ class MovMaker(object):
                 means=means-self.mean
 
             ham=np.hamming(int(self.arguments['--hamming']))
-            name_of_array=np.mean([ham[h]*means[h,:,:] for h in np.arange(len(ham))],axis=0)
             self.cidx=np.where(ham==1)[0][0]
+            # need to record this for doing land masks that are non-zero (e.g. AVISO)
+            # this whole assumption about zero time dimension thing is happening again..
+            self.cidxarray=\
+            self.getdata(Dataset(self.df.iloc[self.cidx]['fname'],'r'))[0]
+            name_of_array=np.mean([ham[h]*means[h,:,:] for h in np.arange(len(ham))],axis=0)
 
             name_of_array_high=means[self.cidx]-name_of_array
            
             ax0 = plt.subplot(gs[0,0])
 
-            goplot(self,ax0,name_of_array)
+            goplot(self,ax0,name_of_array,hamming=True)
 
             if self.arguments['--zoominset']:
-                goplot(self,ax0,name_of_array,zoominset=True)
+                goplot(self,ax0,name_of_array,zoominset=True,hamming=True)
 
             scf.pl_inset_title_box(ax0,'low',bwidth="10%")
             #ax0.set_title('Crossing at 30 S')
