@@ -356,7 +356,6 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
         else:
             cs2=ax.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
 
-
     if MovMakerClass.arguments['--clev']:
         cnt_levelnum=int(MovMakerClass.arguments['--clev'])
     else:
@@ -377,6 +376,9 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
             MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
                     levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),\
                     cmap=MovMakerClass.arguments['--cmap'])
+
+    if not hamming and not zoominset:
+        plt.colorbar(MovMakerClass.cs1,orientation='horizontal')
 
     if MovMakerClass.arguments['--crop']:
         axlims=[float(lim) for lim in MovMakerClass.arguments['--crop'].split('_')]
