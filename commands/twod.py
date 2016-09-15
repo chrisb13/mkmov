@@ -271,6 +271,29 @@ def dispay_passed_args(arguments,workingfolder):
             _lg.error("You passed fighgt but not figwth")
             sys.exit("You passed fighgt but not figwth")
 
+        if arguments['--maggrad']:
+            _lg.info("You have asked for MkMov to plot the magnitude of the horizontal gradient of your requested field.")
+
+        if arguments['--extmin']:
+            _lg.info("You have asked for MkMov to extend the colour range on the minimum end (i.e. no aliasing from little numbers).")
+            if arguments['--extmax']:
+                _lg.error("You passed --extmax and --extmin, please pass --extboth instead.")
+                sys.exit("You passed --extmax and --extmin, please pass --extboth instead.")
+
+        if arguments['--extmax']:
+            _lg.info("You have asked for MkMov to extend the colour range on the maximum end (i.e. no aliasing from big numbers).")
+            if arguments['--extmin']:
+                _lg.error("You passed --extmax and --extmin, please pass --extboth instead.")
+                sys.exit("You passed --extmax and --extmin, please pass --extboth instead.")
+
+        if arguments['--extboth']:
+            _lg.info("You have asked for MkMov to extend the colour range on the minimum/maximum end (i.e. no aliasing from numbers outside the colourbar range).")
+
+            if arguments['--extmax'] or arguments['--extmin']:
+                _lg.error("You passed --extboth as well as --extmin / --extmax, this is not allowed.")
+                sys.exit("You passed --extboth as well as --extmin / --extmax, this is not allowed.")
+
+
         _lg.info("-----------------------------------------------------------------")
     elif arguments['FILE_NAMES']!=[]:
         _lg.info("We are making a movie from your passed list of png files.")
@@ -366,14 +389,27 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
         else:
             cs2=ax.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:].mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
 
+    if MovMakerClass.arguments['--maggrad']:
+        grad=np.gradient(name_of_array[:,:])
+        name_of_array[:,:]=np.sqrt(np.square(grad[0])+np.square(grad[1]))
+
     if MovMakerClass.arguments['--clev']:
         cnt_levelnum=int(MovMakerClass.arguments['--clev'])
     else:
         cnt_levelnum=50
 
+    if MovMakerClass.arguments['--extmin']:
+        opts={'extend':'min'}
+    elif MovMakerClass.arguments['--extmax']:
+        opts={'extend':'max'}
+    elif MovMakerClass.arguments['--extboth']:
+        opts={'extend':'both'}
+    else:
+        opts={}
+
     if not MovMakerClass.arguments['--cmap']:
         MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
-                levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum))
+                levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),**opts)
     else:
         if MovMakerClass.arguments['--bcmapcentre']:
             #will plot colourmap centred around zero
@@ -381,11 +417,11 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
             shiftd=cmap_center_point_adjust(oldcmap,[MovMakerClass.minvar,MovMakerClass.maxvar],0)
             MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
                     levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),\
-                    cmap=shiftd)
+                    cmap=shiftd,**opts)
         else:
             MovMakerClass.cs1=plt.contourf(MovMakerClass.x,MovMakerClass.y,name_of_array[:,:],\
                     levels=np.linspace(MovMakerClass.minvar,MovMakerClass.maxvar,cnt_levelnum),\
-                    cmap=MovMakerClass.arguments['--cmap'])
+                    cmap=MovMakerClass.arguments['--cmap'],**opts)
 
     if not hamming and not zoominset:
         # Create divider for existing axes instance

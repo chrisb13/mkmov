@@ -49,7 +49,7 @@ MkMov: sub-command "2d" help.
     [T1] movie of a netCDF file plotting contourf output.
 
 Usage: 
-    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --hamming HWINSIZE --crop CROPDIMS --zoominset ZOOMDIMS --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --x2d XVARTWOD --y2d YVARTWOD --fixdateline --killsplash] VARIABLE_NAME FILE_NAME...
+    mkmov.py 2d [--min MINIMUM --max MAXIMUM --preview --bias TIMENAME --bcmapcentre -o OUTPATH --lmask LANDVAR --lmask2 LANDVAR2 --lmaskfld --fps FRATE --cmap PLTCMAP --clev LEVELS --4dvar DEPTHLVL --figwth WIDTH --tstart TSTART --tdelta TDELTA --hamming HWINSIZE --crop CROPDIMS --zoominset ZOOMDIMS --fighgt HEIGHT --x XVARIABLE --y YVARIABLE --x2d XVARTWOD --y2d YVARTWOD --fixdateline --maggrad --extmin --extmax --extboth --killsplash] VARIABLE_NAME FILE_NAME...
 
 Arguments:
     VARIABLE_NAME   variable name
@@ -82,6 +82,10 @@ Options:
     --x2d XVARTWOD              : variable to plot on the x-axis (nb: if you specify a xvartwod, you must select a yvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
     --y2d YVARTWOD              : variable to plot on the y-axis (nb: if you specify a yvartwod, you must select a xvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
     --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning: only tested on NEMO output.
+    --maggrad                   : plot the horizontal magnitude of the gradient of the field (i.e. sqrt(grad(field)[0]^2+grad(field)[1]^2))
+    --extmin                    : 'extend' the contourf colour range on the minimum end only
+    --extmax                    : 'extend' the contourf colour range on the maximum end only
+    --extboth                   : 'extend' the contourf colour range on both the minimum and maximum ends (cannot be specified with --extmin or --extmax)
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
 
 References:
