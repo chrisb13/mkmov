@@ -88,3 +88,7 @@ script:
   - python mkmov.py 2d adt --lmask -214748 --x lon --y lat --cmap Accent -o $(pwd)/AVISOdt_global_allsat_madt_Accent.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
   - python mkmov.py 2d PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
   - python mkmov.py 2d PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
+
+
+  #need to add these files to  git-lfs
+  #- python mkmov.py quiver --preview --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_U_2D.nc /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_V_2D.nc

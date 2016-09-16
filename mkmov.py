@@ -25,6 +25,7 @@ This is a python package for making movies. It has four things it can do:
     [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube (see "python mkmov.py 3dcube -h");
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
     [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
+    [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
 
 Usage: 
     mkmov.py -h --help
@@ -35,6 +36,7 @@ Commands:
    3dcube      [T2] use a netCDF file make a movie of a 3d field as a 3d cube
    3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
    stitch      [T4] stitch files together using ffmpeg
+   quiver      [T5] use two netCDF files to make a quiver of a 2d field
    examples    show some examples of commands that work 'out of the box'
 
 See 'python mkmov.py help <command>' for more information on a specific command.
@@ -93,9 +95,6 @@ References:
     [2] http://docs.scipy.org/doc/numpy/reference/arrays.datetime.html
     [3] http://matplotlib.org/mpl_toolkits/axes_grid/users/overview.html (see insetLocator section) and http://stackoverflow.com/questions/10824156/matplotlib-legend-location-numbers
 """
-
-
-    
 
 cube3d = \
 """
@@ -159,6 +158,35 @@ Options:
     --killsplash                : do not display splash screen advertisement for MkMov at end of movie
 """
 
+QUIVERTWOD=\
+"""
+MkMov: sub-command "quiver" help.
+    [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
+
+Usage: 
+    mkmov.py quiver [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --lmask LANDVAR --4dvar DEPTHLVL --x2d XVARTWOD --y2d YVARTWOD --fixdateline] VAR_X VAR_Y FILE_NAME...
+
+Arguments:
+    VAR_X           variable name in the x direction
+    VAR_Y           variable name in the y direction
+    FILE_NAME       path to NetCDF files to make movie, can also be a list of files (dimensions must be the same). Must contain at least two files
+
+Options:
+    -h,--help                   : show this help message
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
+    --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
+    --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
+    --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
+    --x2d XVARTWOD              : variable to plot on the x-axis (nb: if you specify a xvartwod, you must select a yvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
+    --y2d YVARTWOD              : variable to plot on the y-axis (nb: if you specify a yvartwod, you must select a xvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
+    --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning: only tested on NEMO output.
+    --preview                   : show a preview of the plot (will exit afterwards).
+
+References:
+"""
+
+
 EXAMPLES=\
 """
 MkMov: sub-command "examples". Here are some examples that work 'out of the box' (example data included).
@@ -179,6 +207,7 @@ python mkmov.py stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.p
 python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
 python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
 """
+
 
 from docopt import docopt
 import commands as sc
@@ -263,6 +292,25 @@ if __name__ == "__main__":
         arguments=docopt(STITCH)
         workingfol=sc.workingfol_func(arguments)
         sc.stitch_action(workingfol,arguments)
+
+    elif arguments_top['<command>'] == 'quiver':
+        arguments=docopt(QUIVERTWOD)
+        workingfol=sc.workingfol_func(arguments)
+
+        sc.dispay_passed_args_quiver(arguments,workingfol)
+
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
+
+        movmk=sc.MovMakerQuiver(arguments['FILE_NAME'],arguments['VAR_X'],arguments['VAR_Y'],workingfol,arguments)
+
+        # #aah I've always wanted to say this!
+        movmk.lights()
+        movmk.camera(plotpreview=arguments['--preview'])
+        movmk.action()
+        # movmk.cleanup()
 
     elif arguments_top['<command>'] == 'examples':
         print(EXAMPLES)
