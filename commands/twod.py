@@ -274,6 +274,22 @@ def dispay_passed_args(arguments,workingfolder):
         if arguments['--maggrad']:
             _lg.info("You have asked for MkMov to plot the magnitude of the horizontal gradient of your requested field.")
 
+            if (arguments['--vertgrad'] is not None) or (arguments['--hozgrad'] is None):
+                _lg.error("You passed vertgrad/hozgrad as well as maggrad, this is not allowed.")
+                sys.exit("You passed vertgrad/hozgrad as well as maggrad, this is not allowed.")
+
+        if arguments['--vertgrad']:
+            _lg.info("You have asked for MkMov to plot the vertical gradient of your requested field.")
+
+            if arguments['--hozgrad'] is not None:
+                _lg.error("You passed hozgrad as well as vertgrad, this is not allowed.")
+
+        if arguments['--hozgrad']:
+            _lg.info("You have asked for MkMov to plot the horizontal gradient of your requested field.")
+
+            if arguments['--vertgrad'] is not None:
+                _lg.error("You passed vertgrad as well as hozgrad, this is not allowed.")
+
         if arguments['--extmin']:
             _lg.info("You have asked for MkMov to extend the colour range on the minimum end (i.e. no aliasing from little numbers).")
             if arguments['--extmax']:
@@ -392,6 +408,12 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
     if MovMakerClass.arguments['--maggrad']:
         grad=np.gradient(name_of_array[:,:])
         name_of_array[:,:]=np.sqrt(np.square(grad[0])+np.square(grad[1]))
+
+    if MovMakerClass.arguments['--vertgrad']:
+        name_of_array[:,:]=np.gradient(name_of_array[:,:])[0]
+
+    if MovMakerClass.arguments['--hozgrad']:
+        name_of_array[:,:]=np.gradient(name_of_array[:,:])[1]
 
     if MovMakerClass.arguments['--clev']:
         cnt_levelnum=int(MovMakerClass.arguments['--clev'])

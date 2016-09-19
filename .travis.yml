@@ -76,7 +76,9 @@ script:
   - python mkmov.py 2d --min -.15 --max .15 --lmask 0 --cmap seismic --extmin zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc 
   - python mkmov.py 2d --min -.15 --max .15 --lmask 0 --cmap seismic --extmax zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc 
   - python mkmov.py 2d --min -.15 --max .15 --lmask 0 --cmap seismic --extboth zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc 
-  - python mkmov.py 2d --maggrad --min -0.5 --max 0.5 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+  - python mkmov.py 2d --maggrad --min -0 --max 0.5 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+  - python mkmov.py 2d --vertgrad --min -0.5 --max 0.5 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
+  - python mkmov.py 2d --hozgrad --min -0.5 --max 0.5 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
   - python mkmov.py stitch -o $(pwd)/stitchmov.mov $(pwd)/examples/StitchMePlots/*.png
   - python mkmov.py stitch -o $(pwd)/stitchmov2.mov --fps 10 $(pwd)/examples/StitchMePlots/*.png
   - python mkmov.py stitch -o $(pwd)/stitchmov2.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
