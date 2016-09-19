@@ -410,9 +410,11 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
         name_of_array[:,:]=np.sqrt(np.square(grad[0])+np.square(grad[1]))
 
     if MovMakerClass.arguments['--vertgrad']:
+        #relies on y being in first coord
         name_of_array[:,:]=np.gradient(name_of_array[:,:])[0]
 
     if MovMakerClass.arguments['--hozgrad']:
+        #relies on x being in second coord
         name_of_array[:,:]=np.gradient(name_of_array[:,:])[1]
 
     if MovMakerClass.arguments['--clev']:
@@ -549,6 +551,7 @@ class MovMaker(object):
 
             if self.variable_name not in ifile.variables.keys():
                 _lg.error("Variable: " + str(self.variable_name) + " does not exist in netcdf4 file.")
+                _lg.error("Options are: " + str(ifile.variables.keys()) )
                 sys.exit("Variable: " + str(self.variable_name) + " does not exist in netcdf4 file.")
 
             #what shape is the passed variable? Do some error checks

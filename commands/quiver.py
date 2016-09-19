@@ -84,8 +84,32 @@ def dispay_passed_args_quiver(arguments,workingfolder):
         _lg.error("You passed max but not min")
         sys.exit("You passed max but not min")
 
+    if arguments['--tfilevar'] is not None:
+        if arguments['--tfile'] is None:
+            _lg.error("You must specify tfile")
+            sys.exit("You must specify tfile")
+
+    if arguments['--tfile']:
+        _lg.info("You have said you would like to plot a landmask from the following T-file (NEMO only):" + \
+                arguments['--tfile'])
+
+        if arguments['--tfilevar'] is None:
+            _lg.error("You must specify tfilevar")
+            sys.exit("You must specify tfilevar")
+
+        _lg.info("The landmask will be plotted from variable: " + arguments['--tfilevar'])
+
+    if arguments['--cmap']:
+        _lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
+                arguments['--cmap'])
+
+    if arguments['--4dvar']:
+        _lg.info("You have passed a 4 dimensional variable (time,depth,spatialdim1,spatialdim2) and would like to plot DEPTHLVL: " + \
+                str(int(arguments['--4dvar'])))
+
     if arguments['--lmask']:
         _lg.info("You want to mask out the following values: " + arguments['--lmask'])
+
 
     if arguments['--preview']:
         _lg.info("You have opted to preview your plot before making a movie.")
@@ -149,14 +173,21 @@ class MovMakerQuiver(object):
         self.workingfolder=workingfolder
         self.arguments=argu
 
-    def getdata(self,ifile,varname):
+    def getdata(self,ifile,varname,preview=False):
         """function that grabs the data
         :returns: nparray
         """
-        if self.var_len==4:
-            var_nparray=ifile.variables[varname][:,self.depthlvl,:,:]
+        if not preview:
+            if self.var_len==4:
+                var_nparray=ifile.variables[varname][:,self.depthlvl,:,:]
+            else:
+                var_nparray=ifile.variables[varname][:]
         else:
-            var_nparray=ifile.variables[varname][:]
+            if self.var_len==4:
+                var_nparray=ifile.variables[varname][0,self.depthlvl,:,:]
+            else:
+                var_nparray=ifile.variables[varname][0,:]
+            var_nparray=np.expand_dims(var_nparray,axis=0)
     
         return var_nparray
 
@@ -187,10 +218,13 @@ class MovMakerQuiver(object):
 
             if self.variable_x not in ifilex.variables.keys():
                 _lg.error("Variable: " + str(self.variable_x) + " does not exist in netcdf4 file.")
+                _lg.error("Options are: " + str(ifilex.variables.keys()) )
                 sys.exit("Variable: " + str(self.variable_x) + " does not exist in netcdf4 file.")
 
             if self.variable_y not in ifiley.variables.keys():
                 _lg.error("Variable: " + str(self.variable_y) + " does not exist in netcdf4 file.")
+                _lg.error("Options are: " + str(ifiley.variables.keys()) )
+
                 sys.exit("Variable: " + str(self.variable_y) + " does not exist in netcdf4 file.")
 
             ifiley.close()
@@ -272,12 +306,22 @@ class MovMakerQuiver(object):
         #might have been leaking memory? 
         plt.close('all')
 
+        if self.arguments['--cmap'] is not None:
+            opts={'cmap':self.arguments['--cmap']}
+        else:
+            opts={}
+
         for xf,yf in zip(self.xfiles,self.yfiles):
         # for f in self.filelist:
             ifilex=Dataset(xf, 'r')
             ifiley=Dataset(yf, 'r')
-            name_of_arrayx=self.getdata(ifilex,self.variable_x)
-            name_of_arrayy=self.getdata(ifiley,self.variable_y)
+
+            if not plotpreview:
+                name_of_arrayx=self.getdata(ifilex,self.variable_x)
+                name_of_arrayy=self.getdata(ifiley,self.variable_y)
+            else:
+                name_of_arrayx=self.getdata(ifilex,self.variable_x,preview=True)
+                name_of_arrayy=self.getdata(ifiley,self.variable_y,preview=True)
 
             #h'm the following loop has a problem, because if tstep isn't in dim 0 we are screwed! (probably needs some fancy syntax to slice out of name_of_array (hard without google)
             if self.timedim!=0:
@@ -305,6 +349,11 @@ class MovMakerQuiver(object):
             else:
                 x,y=np.meshgrid(np.arange(np.shape(name_of_arrayx[0])[1]),np.arange(np.shape(name_of_arrayx[0])[0]))
 
+            if self.arguments['--tfile'] is not None:
+                ifile=Dataset(self.arguments['--tfile'], 'r')
+                lmask=ifile.variables[self.arguments['--tfilevar']][0,:] #assumes a 3d file
+                lmask=np.ma.masked_where(lmask==0,lmask) 
+
             #assumes the x/y files have the same number of timesteps
             for tstep in np.arange(np.shape(name_of_arrayx)[self.timedim]):
                 _lg.debug("Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
@@ -324,24 +373,43 @@ class MovMakerQuiver(object):
                     #can look a bit funky b/c we're now on t-points..
                     # ax.contour(x,y,arrayx.mask,levels=[-1,0],linewidths=1,colors='black')
 
-                # http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.quiver
-                skip=(slice(None,None,5),slice(None,None,5))
-                mag=np.sqrt(np.square(arrayx)+np.square(arrayy))
-                if (self.arguments['--min'] is not None) and (self.arguments['--max'] is not None):
-                    cs1=ax.contourf(x,y,mag,levels=np.linspace(\
-                            float(self.arguments['--min']),\
-                            float(self.arguments['--max']),30),extend='both')
+                if self.arguments['--tfile']:
+                    cs2=ax.contourf(x,y,lmask.mask,levels=[-1,0,1],colors=('#B2D1FF','#858588'),alpha=.9) #landmask
+
+                if self.arguments['--vorticity']:
+                    # dv/dx - du/dy (hopefully!)
+                    name_of_array=\
+                    np.gradient(arrayy)[1]-np.gradient(arrayx)[0]
+                    if (self.arguments['--min'] is not None) and (self.arguments['--max'] is not None):
+                        cs1=plt.contourf(x,y,name_of_array,30,\
+                                levels=np.linspace(\
+                                float(self.arguments['--min']),\
+                                float(self.arguments['--max']),30),extend='both',**opts)
+                    else:
+                        cs1=plt.contourf(x,y,name_of_array,30,levels=np.linspace(-.5,.5,30),extend='both',**opts)
+
+
+                    ax.set_title("Plotting vorticity: "+self.variable_x+' and  '+self.variable_y+'. Frame num is: ' +str(self.framecnt))
                 else:
-                    cs1=ax.contourf(x,y,mag,levels=np.linspace(0,01,30),extend='both')
+                    # http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.quiver
+                    skip=(slice(None,None,5),slice(None,None,5))
+                    mag=np.sqrt(np.square(arrayx)+np.square(arrayy))
+                    if (self.arguments['--min'] is not None) and (self.arguments['--max'] is not None):
+                        cs1=ax.contourf(x,y,mag,\
+                                levels=np.linspace(\
+                                float(self.arguments['--min']),\
+                                float(self.arguments['--max']),30),extend='both',**opts)
+                    else:
+                        cs1=ax.contourf(x,y,mag,levels=np.linspace(0,1,30),extend='both',**opts)
 
-                #if we want to normalise...
-                # arrayx=arrayx/mag
-                # arrayy=arrayy/mag
-                # plt.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale=1)
+                    #if we want to normalise...
+                    # arrayx=arrayx/mag
+                    # arrayy=arrayy/mag
+                    # plt.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale=1)
 
-                ax.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale_units='xy')
+                    ax.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale_units='xy')
 
-                ax.set_title("Plotting: "+self.variable_x+' and  '+self.variable_y+'. Frame num is: ' +str(self.framecnt))
+                    ax.set_title("Plotting: "+self.variable_x+' and  '+self.variable_y+'. Frame num is: ' +str(self.framecnt))
 
 
                 # Create divider for existing axes instance

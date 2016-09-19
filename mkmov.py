@@ -85,8 +85,8 @@ Options:
     --y2d YVARTWOD              : variable to plot on the y-axis (nb: if you specify a yvartwod, you must select a xvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
     --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning: only tested on NEMO output.
     --maggrad                   : plot the horizontal magnitude of the gradient of the field (i.e. sqrt(grad(field)[0]^2+grad(field)[1]^2))
-    --vertgrad                  : plot the vertical gradient of the field F (i.e. dF/dy). NB: cannot be used with maggrad.
-    --hozgrad                   : plot the horizontal gradient of the field F (i.e. dF/dx). NB: cannot be used with maggrad.
+    --vertgrad                  : plot the vertical gradient of the field F (i.e. dF/dy). NB: cannot be used with maggrad. Assumes y is in 'first' coord.
+    --hozgrad                   : plot the horizontal gradient of the field F (i.e. dF/dx). NB: cannot be used with maggrad. Assumes x is in 'second' coord.
     --extmin                    : 'extend' the contourf colour range on the minimum end only
     --extmax                    : 'extend' the contourf colour range on the maximum end only
     --extboth                   : 'extend' the contourf colour range on both the minimum and maximum ends (cannot be specified with --extmin or --extmax)
@@ -166,7 +166,7 @@ MkMov: sub-command "quiver" help.
     [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
 
 Usage: 
-    mkmov.py quiver [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --lmask LANDVAR --4dvar DEPTHLVL --x2d XVARTWOD --y2d YVARTWOD --fixdateline] VAR_X VAR_Y FILE_NAME...
+    mkmov.py quiver [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --vorticity --tfile TFILE --tfilevar TFILEVAR --cmap PLTCMAP --lmask LANDVAR --4dvar DEPTHLVL --x2d XVARTWOD --y2d YVARTWOD --fixdateline] VAR_X VAR_Y FILE_NAME...
 
 Arguments:
     VAR_X           variable name in the x direction
@@ -176,16 +176,21 @@ Arguments:
 Options:
     -h,--help                   : show this help message
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+    --preview                   : show a preview of the plot (will exit afterwards).
+    --vorticity                 : plot vorticity
+    --tfile TFILE               : plot land mask from T-file            (must specify tfilevar), assumes a 3d file from NEMO T-grid.
+    --tfilevar TFILEVAR         : variable from T-file to plot landmask (must specify tfile)
+    --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.
     --lmask LANDVAR             : land value to mask out (will draw a solid black contour around the land points)
     --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
     --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
     --x2d XVARTWOD              : variable to plot on the x-axis (nb: if you specify a xvartwod, you must select a yvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
     --y2d YVARTWOD              : variable to plot on the y-axis (nb: if you specify a yvartwod, you must select a xvartwod.) This is for unstructured grids, when coordinates depend on both (x,y).
-    --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning: only tested on NEMO output.
-    --preview                   : show a preview of the plot (will exit afterwards).
+    --fixdateline               : fix the dateline on --x2d (nb: if you select --fixdateline, you must specify --x2d and --y2d). Warning (experimental): only tested on NEMO output.
 
 References:
+    [1] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
 
