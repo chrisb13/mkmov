@@ -67,6 +67,13 @@ def dispay_passed_args_twodbm(arguments,workingfolder):
             _lg.error("You passed max but not min")
             sys.exit("You passed max but not min")
 
+        #TODO 
+        #could add this interpolate option later..
+        # import scipy.interpolate
+        # nlons,nlats=np.meshgrid(np.arange(0,360,0.1),np.arange(-90,90,0.1))
+        # sst=scipy.interpolate.griddata((lons.flatten(),lats.flatten()),sst.flatten() , (nlons,nlats),method='cubic')
+        # lons,lats=nlons,nlats
+
         if arguments['--cmap']:
             _lg.info("You have said you would like to pcolormesh with the following matplotlib colour map: " + \
                     arguments['--cmap'])

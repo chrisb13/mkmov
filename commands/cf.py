@@ -45,6 +45,11 @@ def check_dependencies():
     except ImportError:
         _lg.warning("You don't have the (optional) Pandas library. Needed for hamming filter.")
 
+    try:
+        imp.find_module('mpl_toolkits')
+    except ImportError:
+        _lg.warning("You don't have the (optional) Basemap library. Needed for basemap colormesh option.")
+
     #This is the error message if ffmpeg is not installed...
     #The program 'ffmpeg' is currently not installed.  You can install it by typing:
         #sudo apt-get install libav-tools

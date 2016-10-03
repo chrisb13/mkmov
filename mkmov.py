@@ -26,7 +26,7 @@ This is a python package for making movies. It has four things it can do:
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
     [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
     [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
-    [T6] movie of a netCDF file plotting contourf output using basemap
+    [T6] movie of a netCDF file plotting pcolormesh output using basemap
 
 Usage: 
     mkmov.py -h --help
@@ -199,7 +199,7 @@ References:
 TWODBM=\
 """
 MkMov: sub-command "2dbm" help.
-    [T6] movie of a netCDF file plotting contourf output using basemap
+    [T6] movie of a netCDF file plotting pcolormesh output using basemap
 
 Usage: 
     mkmov.py 2dbm [--preview --proj PROJECTION --rotatex XSPEED --xorigin XSTART --yorigin YSTART --zoom ZOOM --min MINIMUM --max MAXIMUM --cmap PLTCMAP -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
