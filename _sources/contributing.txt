@@ -10,7 +10,7 @@ This utility is completely open source and pull requests that pass the `tests`_,
 
 Features that would be awesome:
 
-#. 3d plots/quiver plots/multiple variables etc.
+#. multiple variables
 #. basemap integration
 #. installation with Anaconda
 #. subplots
