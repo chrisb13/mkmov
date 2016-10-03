@@ -48,6 +48,7 @@ This is a python package for making movies. It has four things it can do:
 [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see &quot;python mkmov.py 3dsurf -h&quot;);
 [T4] stitch a list of png files into a movie (&quot;see python mkmov.py stitch -h&quot;).
 [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
+[T6] movie of a netCDF file plotting pcolormesh output using basemap
 
 Usage:
     mkmov.py -h --help
@@ -59,6 +60,7 @@ Commands:
     3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
     stitch      [T4] stitch files together using ffmpeg
     quiver      [T5] use two netCDF files to make a quiver of a 2d field
+    2dbm        [T6] use a netCDF file make a contourf of a 2d field and use basemap
     examples    show some examples of commands that work &#39;out of the box&#39;
 
 See &#39;python mkmov.py help &lt;command&gt;&#39; for more information on a specific command.

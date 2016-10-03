@@ -11,6 +11,7 @@ Functionality as follows:
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
     [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
     [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
+    [T6] movie of a netCDF file plotting pcolormesh output using basemap
 
     Usage: 
         mkmov.py -h --help
@@ -22,6 +23,7 @@ Functionality as follows:
         3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
         stitch      [T4] stitch files together using ffmpeg
         quiver      [T5] use two netCDF files to make a quiver of a 2d field
+        2dbm        [T6] use a netCDF file make a contourf of a 2d field and use basemap
         examples    show some examples of commands that work 'out of the box'
 
     See 'python mkmov.py help <command>' for more information on a specific command.
