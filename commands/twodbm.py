@@ -47,6 +47,9 @@ def dispay_passed_args_twodbm(arguments,workingfolder):
         if arguments['--proj']:
             _lg.info("You want your movie to have projection : " + arguments['--proj'])
 
+        if arguments['--boundinglat']:
+            _lg.info("Your movie will have the following bounding latitude (needed for some projections): " + arguments['--boundinglat'])
+
         if arguments['--rotatex']:
             _lg.info("You want to have your globe spinning along the x-axis at speed: " + arguments['--rotatex'])
 
@@ -69,10 +72,6 @@ def dispay_passed_args_twodbm(arguments,workingfolder):
 
         #TODO 
         #could add this interpolate option later..
-        # import scipy.interpolate
-        # nlons,nlats=np.meshgrid(np.arange(0,360,0.1),np.arange(-90,90,0.1))
-        # sst=scipy.interpolate.griddata((lons.flatten(),lats.flatten()),sst.flatten() , (nlons,nlats),method='cubic')
-        # lons,lats=nlons,nlats
 
         if arguments['--cmap']:
             _lg.info("You have said you would like to pcolormesh with the following matplotlib colour map: " + \
@@ -247,9 +246,14 @@ class MovMakerTwodBM(object):
             # self.maxvar=float(maxvar)
 
         ifile=Dataset(self.filelist[0], 'r') #they should all be the same.
-        xvar=ifile.variables[self.arguments['X_NAME']][:]
-        yvar=ifile.variables[self.arguments['Y_NAME']][:]
-        self.x,self.y=np.meshgrid(xvar,yvar)
+        if len(ifile.variables[self.arguments['X_NAME']].shape)==2:
+            _lg.warning("Looks like you have an unstructured grid, I'll try and cope with this...")
+            self.x,self.y=ifile.variables[self.arguments['X_NAME']][:],\
+            ifile.variables[self.arguments['Y_NAME']][:]
+        else:
+            xvar=ifile.variables[self.arguments['X_NAME']][:]
+            yvar=ifile.variables[self.arguments['Y_NAME']][:]
+            self.x,self.y=np.meshgrid(xvar,yvar)
         ifile.close()
 
         # else:
@@ -305,6 +309,9 @@ class MovMakerTwodBM(object):
             opts['urcrnrlon']=float(corners[2])
             opts['urcrnrlat']=float(corners[3])
 
+        if self.arguments['--boundinglat']:
+            opts['boundinglat']=float(self.arguments['--boundinglat'])
+
         pmeshopts={'cmap':'viridis'}
         if self.arguments['--min'] and self.arguments['--max']:
             pmeshopts['vmin']=float(self.arguments['--min'])
@@ -318,7 +325,7 @@ class MovMakerTwodBM(object):
         for f in self.filelist:
         # for f in self.filelist:
             ifile=Dataset(f, 'r')
-            maskarray=ifile.variables['adt'][0,:].squeeze().mask
+            maskarray=ifile.variables[self.arguments['VARIABLE_NAME']][0,:].squeeze().mask
 
             if not plotpreview:
                 name_of_array=self.getdata(ifile)
@@ -355,6 +362,11 @@ class MovMakerTwodBM(object):
                 m = Basemap(projection=proj,resolution=None,**opts)
                 # lons,lats=m(lons,lats)
 
+                # import scipy.interpolate
+                # nlons,nlats=np.meshgrid(np.arange(0,360,0.1),np.arange(-90,90,0.1))
+                # name_of_array_slice=scipy.interpolate.griddata((self.x.flatten(),self.y.flatten()),name_of_array_slice.flatten() , (nlons,nlats),method='cubic')
+                # self.x,self.y=nlons,nlats
+
                 # draw line around map projection limb.
                 # color background of map projection region.
                 # missing values over land will show up this color.
@@ -363,12 +375,12 @@ class MovMakerTwodBM(object):
                 #x and y give the positions of the grid data if the latlon argument is true
                 im1 = m.pcolormesh(self.x,self.y,name_of_array_slice,shading='flat',latlon=True,**pmeshopts)
 
-                # im1 = m.pcolormesh(lons,lats,sst,shading='flat',cmap=plt.cm.jet,latlon=False)
-                # im1 = m.contourf(lons,lats,sst,30,shading='flat',cmap=plt.cm.jet,latlon=False)
 
                 # draw parallels and meridians, but don't bother labelling them.
                 m.drawparallels(np.arange(-90.,99.,30.))
                 m.drawmeridians(np.arange(-180.,180.,60.))
+
+
                 # add colorbar
                 cb = m.colorbar(im1,"bottom", size="5%", pad="2%")
 

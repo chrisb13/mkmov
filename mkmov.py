@@ -202,7 +202,7 @@ MkMov: sub-command "2dbm" help.
     [T6] movie of a netCDF file plotting pcolormesh output using basemap
 
 Usage: 
-    mkmov.py 2dbm [--preview --proj PROJECTION --rotatex XSPEED --xorigin XSTART --yorigin YSTART --zoom ZOOM --min MINIMUM --max MAXIMUM --cmap PLTCMAP -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
+    mkmov.py 2dbm [--preview --proj PROJECTION  --boundinglat LATBOUND --rotatex XSPEED --xorigin XSTART --yorigin YSTART --zoom ZOOM --min MINIMUM --max MAXIMUM --cmap PLTCMAP --4dvar DEPTHLVL  -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
 
 Arguments:
     X_NAME          variable for longitudes
@@ -214,6 +214,7 @@ Options:
     -h,--help                   : show this help message
     --preview                   : show a preview of the plot (will exit afterwards).
     --proj PROJECTION           : projection, options are [2], default is 'moll'
+    --boundinglat LATBOUND      : bounding latitude, needed for some projections, e.g. [5]
     --rotatex XSPEED            : spin/rotate the x coordinate (each frame will increment the specified number of degrees)
     --xorigin XSTART            : xcenter of map will be located at xorigin (default is 130 E)
     --yorigin YSTART            : ycenter of map will be located at yorigin (default is 0    )
@@ -221,6 +222,7 @@ Options:
     --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
     --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
     --cmap PLTCMAP              : matplotlib color map to pcolormesh with. See [4] for options.
+    --4dvar DEPTHLVL            : passing 4d variable of the form (time,depth,spatialdim1,spatialdim2), DEPTHLVL is the depth/height level you would like to plot (default is level 0).
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
 
 References:
@@ -228,6 +230,7 @@ References:
     [2] http://matplotlib.org/basemap/users/mapsetup.html
     [3] http://basemaptutorial.readthedocs.io/en/latest/utilities.html
     [4] http://matplotlib.org/examples/color/colormaps_reference.html
+    [5] http://matplotlib.org/basemap/users/pstere.html
 """
 
 
