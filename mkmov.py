@@ -195,13 +195,14 @@ References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
+
 TWODBM=\
 """
 MkMov: sub-command "2dbm" help.
     [T6] movie of a netCDF file plotting contourf output using basemap
 
 Usage: 
-    mkmov.py 2dbm [--preview --proj PROJECTION --rotatex XSPEED --xorigin XSTART --yorigin YSTART -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
+    mkmov.py 2dbm [--preview --proj PROJECTION --rotatex XSPEED --xorigin XSTART --yorigin YSTART --zoom ZOOM --min MINIMUM --max MAXIMUM --cmap PLTCMAP -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
 
 Arguments:
     X_NAME          variable for longitudes
@@ -216,11 +217,17 @@ Options:
     --rotatex XSPEED            : spin/rotate the x coordinate (each frame will increment the specified number of degrees)
     --xorigin XSTART            : xcenter of map will be located at xorigin (default is 130 E)
     --yorigin YSTART            : ycenter of map will be located at yorigin (default is 0    )
+    --zoom ZOOM                 : zoom plot to llcrnrlon_llcrnrlat_urcrnrlon_urcrnrlat, e.g. Australian region is: 90.25_-50_220.25_-10.75. See [3] for more details. NB: this will only be effective on some projections (e.g. not moll but merc normally works)
+    --min MINIMUM               : the minimum value for the contour map (nb: if you select a min, you must select a max.)
+    --max MAXIMUM               : the maximum value for the contour map (nb: if you select a max, you must select a min.)
+    --cmap PLTCMAP              : matplotlib color map to pcolormesh with. See [4] for options.
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
 
 References:
     [1] http://matplotlib.org/basemap/
     [2] http://matplotlib.org/basemap/users/mapsetup.html
+    [3] http://basemaptutorial.readthedocs.io/en/latest/utilities.html
+    [4] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
 

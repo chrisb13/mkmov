@@ -50,6 +50,27 @@ def dispay_passed_args_twodbm(arguments,workingfolder):
         if arguments['--rotatex']:
             _lg.info("You want to have your globe spinning along the x-axis at speed: " + arguments['--rotatex'])
 
+        if arguments['--zoom']:
+            _lg.info("You have chosen to zoom in on the following lower-left and upper-right corner: " + arguments['--zoom'])
+            if len(arguments['--zoom'].split('_'))!=4:
+                _lg.error("Please supply four zoom arguments.")
+                sys.exit("Please supply four zoom arguments.")
+
+        if (arguments['--min'] is not None) and (arguments['--max'] is not None):
+            _lg.info("You have specified a min/max range of: "+arguments['--min']+', '+arguments['--max'] )
+
+        #error check to make sure both min and max were passed
+        if (arguments['--min'] is not None) and (arguments['--max'] is None):
+            _lg.error("You passed min but not max")
+            sys.exit("You passed min but not max")
+        elif(arguments['--min'] is None) and (arguments['--max'] is not None): 
+            _lg.error("You passed max but not min")
+            sys.exit("You passed max but not min")
+
+        if arguments['--cmap']:
+            _lg.info("You have said you would like to pcolormesh with the following matplotlib colour map: " + \
+                    arguments['--cmap'])
+
         if arguments['--xorigin']:
             _lg.info("You want your movie to have xcentre : " + arguments['--xorigin'])
 
@@ -270,6 +291,21 @@ class MovMakerTwodBM(object):
         else:
             opts={'lon_0':130,'lat_0':0}
 
+        if self.arguments['--zoom']:
+            corners=self.arguments['--zoom'].split('_')
+            opts['llcrnrlon']=float(corners[0])
+            opts['llcrnrlat']=float(corners[1])
+            opts['urcrnrlon']=float(corners[2])
+            opts['urcrnrlat']=float(corners[3])
+
+        pmeshopts={'cmap':'viridis'}
+        if self.arguments['--min'] and self.arguments['--max']:
+            pmeshopts['vmin']=float(self.arguments['--min'])
+            pmeshopts['vmax']=float(self.arguments['--max'])
+                    
+            
+
+        fig=plt.figure()
         for f in self.filelist:
         # for f in self.filelist:
             ifile=Dataset(f, 'r')
@@ -284,10 +320,9 @@ class MovMakerTwodBM(object):
             if self.timedim!=0:
                 _lg.error("Your time dimension wasn't in the first dimension, MkMov doesn't know what to do with this kind of file.")
                 sys.exit("Your time dimension wasn't in the first dimension, MkMov doesn't know what to do with this kind of file.")
-            fig=plt.figure()
 
             for tstep in np.arange(np.shape(name_of_array)[self.timedim]):
-                _lg.debug("Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
+                _lg.debug("File: "+os.path.basename(f)+". Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
                 ax=fig.add_subplot(111)
 
                 if self.arguments['--rotatex']:
@@ -299,14 +334,12 @@ class MovMakerTwodBM(object):
                 else:
                     proj='moll'
 
-                name_of_array_slice=name_of_array[tstep,:].squeeze()
-
                 #for some unknown reason all this slicing kills the mask, so will put it back
                 #this is a dodgy hack!
-                name_of_array_slice=np.ma.masked_where(\
-                       name_of_array_slice,\
+                name_of_array_slice=np.ma.MaskedArray(\
+                       name_of_array[tstep,:],\
                        mask=maskarray)
-                       
+
                 # create Basemap instance.
                 # coastlines not used, so resolution set to None to skip
                 # continent processing (this speeds things up a bit)
@@ -319,7 +352,7 @@ class MovMakerTwodBM(object):
                 m.drawmapboundary(fill_color='0.3')
 
                 #x and y give the positions of the grid data if the latlon argument is true
-                im1 = m.pcolormesh(self.x,self.y,name_of_array_slice,shading='flat',cmap=plt.cm.jet,latlon=True)
+                im1 = m.pcolormesh(self.x,self.y,name_of_array_slice,shading='flat',latlon=True,**pmeshopts)
 
                 # im1 = m.pcolormesh(lons,lats,sst,shading='flat',cmap=plt.cm.jet,latlon=False)
                 # im1 = m.contourf(lons,lats,sst,30,shading='flat',cmap=plt.cm.jet,latlon=False)
