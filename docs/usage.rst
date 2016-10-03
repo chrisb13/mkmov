@@ -4,13 +4,11 @@ Usage
 
 Functionality as follows:
 ::
-    MkMov v0.4
     This is a python package for making movies. It has four things it can do:
     [T1] movie of a netCDF file plotting contourf output (see "python mkmov.py 2d -h");
     [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube (see "python mkmov.py 3dcube -h");
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
     [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
-    [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
 
     Usage: 
         mkmov.py -h --help
@@ -21,7 +19,6 @@ Functionality as follows:
         3dcube      [T2] use a netCDF file make a movie of a 3d field as a 3d cube
         3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
         stitch      [T4] stitch files together using ffmpeg
-        quiver      [T5] use two netCDF files to make a quiver of a 2d field
         examples    show some examples of commands that work 'out of the box'
 
     See 'python mkmov.py help <command>' for more information on a specific command.
@@ -32,7 +29,7 @@ Basic usage
 
 We have tried to make this program as easy to install and use as possible. Interface is by command line and everything is done in one line!
 
-A 2d movie (usage [T1]) is a good place to start, some of the options are the same across functions.
+A 2d movie (usage [T1]) is a good place to start, some of the options are the same across functions...
 
 Basic usage, to make a 2d movie from a netCDF file is as follows: 
 ::

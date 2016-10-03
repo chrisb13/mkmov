@@ -28,7 +28,7 @@ This movie was created with a single line command, namely
 ::
     python mkmov.py 2d adt --lmask -214748 --cmap Set3 -o /srv/ccrc/data42/z3457920/mkmovmovies4/AVISOdt_global_allsat_madt_Set3.mov /srv/ccrc/data42/z3457920/RawData/AVISO/RawData/dt_global_allsat_madt/ftp.aviso.altimetry.fr/global/delayed-time/grids/madt/all-sat-merged/h/*/*.nc &>  /srv/ccrc/data42/z3457920/mkmovmovies4/15.log &
 
-MkMov does more than just filled contour plots, have a look at `usage`_ to see other options. More examples with their respective run command `here`_.
+More examples with their respective run command `here`_.
 
 .. _here: http://christopherbull.com.au/mkmov/examples.html
 
