@@ -199,24 +199,24 @@ class MovMakerTwodBM(object):
             sys.exit("(Unlimited) 'time' dimension was not the same across all files, fatal error.")
 
         #get max and min values for timeseries. This is expensive :(
-        if (minvar is None) and (maxvar is None):
-            mins=[]
-            maxs=[]
-            for f in self.filelist:
-                ifile=Dataset(f, 'r')
-                name_of_array=self.getdata(ifile)
+        # if (minvar is None) and (maxvar is None):
+            # mins=[]
+            # maxs=[]
+            # for f in self.filelist:
+                # ifile=Dataset(f, 'r')
+                # name_of_array=self.getdata(ifile)
 
-                mins.append(np.min(name_of_array))
-                maxs.append(np.max(name_of_array))
-                ifile.close()
+                # mins.append(np.min(name_of_array))
+                # maxs.append(np.max(name_of_array))
+                # ifile.close()
 
-            self.minvar=np.min(mins)
-            self.maxvar=np.max(maxs)
+            # self.minvar=np.min(mins)
+            # self.maxvar=np.max(maxs)
 
-        if minvar or maxvar is not None:
-            #user specified the range
-            self.minvar=float(minvar)
-            self.maxvar=float(maxvar)
+        # if minvar or maxvar is not None:
+            # #user specified the range
+            # self.minvar=float(minvar)
+            # self.maxvar=float(maxvar)
 
         ifile=Dataset(self.filelist[0], 'r') #they should all be the same.
         xvar=ifile.variables[self.arguments['X_NAME']][:]
@@ -273,10 +273,7 @@ class MovMakerTwodBM(object):
         for f in self.filelist:
         # for f in self.filelist:
             ifile=Dataset(f, 'r')
-
-            if self.arguments['--rotatex']:
-                opts['lon_0']=np.mod(opts['lon_0']+float(self.arguments['--rotatex']),360)
-                print opts['lon_0']
+            maskarray=ifile.variables['adt'][0,:].squeeze().mask
 
             if not plotpreview:
                 name_of_array=self.getdata(ifile)
@@ -293,6 +290,10 @@ class MovMakerTwodBM(object):
                 _lg.debug("Working timestep: " + str(self.framecnt)+ " frames in: " +self.workingfolder)
                 ax=fig.add_subplot(111)
 
+                if self.arguments['--rotatex']:
+                    opts['lon_0']=np.mod(opts['lon_0']+float(self.arguments['--rotatex']),360)
+                    # print opts['lon_0']
+
                 if self.arguments['--proj']:
                     proj=self.arguments['--proj']
                 else:
@@ -303,10 +304,9 @@ class MovMakerTwodBM(object):
                 #for some unknown reason all this slicing kills the mask, so will put it back
                 #this is a dodgy hack!
                 name_of_array_slice=np.ma.masked_where(\
-                       ifile.variables['adt'][0,:].squeeze().mask\
-                       ,name_of_array_slice) 
-
-
+                       name_of_array_slice,\
+                       mask=maskarray)
+                       
                 # create Basemap instance.
                 # coastlines not used, so resolution set to None to skip
                 # continent processing (this speeds things up a bit)
