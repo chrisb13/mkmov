@@ -274,7 +274,7 @@ def dispay_passed_args(arguments,workingfolder):
         if arguments['--maggrad']:
             _lg.info("You have asked for MkMov to plot the magnitude of the horizontal gradient of your requested field.")
 
-            if (arguments['--vertgrad'] is not None) or (arguments['--hozgrad'] is None):
+            if (arguments['--vertgrad']) or (arguments['--hozgrad']):
                 _lg.error("You passed vertgrad/hozgrad as well as maggrad, this is not allowed.")
                 sys.exit("You passed vertgrad/hozgrad as well as maggrad, this is not allowed.")
 
