@@ -16,7 +16,9 @@ from matplotlib.ticker import MultipleLocator
 from ._twod import _LogStart
 _lg=_LogStart().setup()
 
-import scf
+#needed to add this for python 3 support...
+from .scf import mkdir_sub,pl_inset_title_box,call_ffmpeg
+
 
 """
 MkMov: sub-command "2d" workhorse file.
@@ -529,7 +531,7 @@ class MovMaker(object):
             subprocess.call(ncout,shell=True)
 
             difffol=self.workingfolder+'difffiles/'
-            scf.mkdir_sub(self.workingfolder+'difffiles/')
+            mkdir_sub(self.workingfolder+'difffiles/')
             newfilelist=[]
             cnt=0
             for f in self.filelist:
@@ -874,14 +876,14 @@ class MovMaker(object):
             if self.arguments['--zoominset']:
                 goplot(self,ax0,name_of_array,zoominset=True,hamming=True)
 
-            scf.pl_inset_title_box(ax0,'low',bwidth="10%")
+            pl_inset_title_box(ax0,'low',bwidth="10%")
             #ax0.set_title('Crossing at 30 S')
             # ax0.set_ylabel('Transport (Sv)')
             
             ax1 = plt.subplot(gs[0,1],sharey=ax0)
             goplot(self,ax1,name_of_array_high,hamming=True)
 
-            scf.pl_inset_title_box(ax1,'high',bwidth="10%")
+            pl_inset_title_box(ax1,'high',bwidth="10%")
 
             if self.arguments['--zoominset']:
                 goplot(self,ax1,name_of_array_high,zoominset=True,hamming=True)
@@ -918,7 +920,7 @@ class MovMaker(object):
         """
         _lg.info("Action! Stitching your plots together with ffmpeg...")
 
-        scf.call_ffmpeg(self.workingfolder,fps_pass=self.arguments['--fps'],outputdir=self.arguments['-o'])
+        call_ffmpeg(self.workingfolder,fps_pass=self.arguments['--fps'],outputdir=self.arguments['-o'])
 
 
     def cleanup(self):

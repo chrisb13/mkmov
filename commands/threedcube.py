@@ -6,7 +6,8 @@ import sys
 from ._threedcube import _LogStart
 _lg=_LogStart().setup()
 
-import scf
+#needed to add this for python 3 support...
+from .scf import call_ffmpeg,axisEqual3D
 
 """
 MkMov: sub-command "3dcube" workhorse file.
@@ -404,7 +405,7 @@ class MovMakerThreeDCube(object):
                 # plt.colorbar(cs1)
                 # #plt.show()
 
-                scf.axisEqual3D(ax)
+                axisEqual3D(ax)
 
                 if self.arguments['--preview']:
                     plt.show()

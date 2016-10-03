@@ -2,7 +2,7 @@ import os
 from ._stitch import _LogStart
 _lg=_LogStart().setup()
 
-import scf
+from .scf import call_ffmpeg
 
 """
 MkMov: sub-command "stitch" workhorse file.
@@ -38,7 +38,7 @@ def stitch_action(workingfolder,args):
             _lg.warning("Couldn't insert the logo at the end, sorry!")
 
 
-    scf.call_ffmpeg(workingfolder,fps_pass=args['--fps'],outputdir=args['-o'])
+    call_ffmpeg(workingfolder,fps_pass=args['--fps'],outputdir=args['-o'])
 
     #remove working folder
     if args['-o']:

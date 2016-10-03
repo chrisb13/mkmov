@@ -85,10 +85,13 @@ class _LogStart(object):
    "class that sets up a logger"
    def setup(self,fname=''):
        if fname=='':
+           # _logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
+               # level=_logging.DEBUG,disable_existing_loggers=True)
+
            _logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
-               level=_logging.DEBUG,disable_existing_loggers=True)
+               level=_logging.DEBUG)
        else:
-          _logging.basicConfig(filename=fname,filemode='w',format='%(name)s - %(levelname)s - %(message)s',
+           _logging.basicConfig(filename=fname,filemode='w',format='%(name)s - %(levelname)s - %(message)s',
                   level=lg.DEBUG,disable_existing_loggers=False) #where filemode clobbers file
 
        lg = _logging.getLogger(__name__)

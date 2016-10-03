@@ -11,6 +11,7 @@ Welcome to MkMov. This utility is designed to make a movie from a NetCDF file or
 
 # Usage
 [![asciicast](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo.png)](https://asciinema.org/a/7etd14t6r4wqsccipcduhcrgo)
+This movie refers to an older version of MkMov, insert ‘2d’ after ‘python mkmov.py’.
 
 or
 

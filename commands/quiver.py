@@ -11,7 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from ._quiver import _LogStart
 _lg=_LogStart().setup()
 
-import scf
+from .scf import call_ffmpeg
 
 """
 MkMov: sub-command "quiver" workhorse file.
@@ -440,7 +440,7 @@ class MovMakerQuiver(object):
         """
         _lg.info("Action! Stitching your plots together with ffmpeg...")
 
-        scf.call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
+        call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
 
     def cleanup(self):
         """function to clean up the mess we have made

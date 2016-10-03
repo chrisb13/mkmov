@@ -4,7 +4,8 @@ import os,sys
 from ._threedsurf import _LogStart
 _lg=_LogStart().setup()
 
-import scf
+#needed to add this for python 3 support...
+from .scf import call_ffmpeg,axisEqual3D
 
 """
 MkMov: sub-command "3dsurf" workhorse file.
@@ -242,7 +243,7 @@ class MovMakerThreeDSurf(object):
                                 levels=np.linspace(self.minvar,self.maxvar,30),cmap=plt.cm.jet)
 
                 fig.colorbar(surf, shrink=0.5, aspect=5)
-                scf.axisEqual3D(ax)
+                axisEqual3D(ax)
 
                 if self.arguments['--preview']:
                     plt.show()
@@ -282,4 +283,4 @@ class MovMakerThreeDSurf(object):
         """
         _lg.info("Action! Stitching your plots together with ffmpeg...")
 
-        scf.call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
+        call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
