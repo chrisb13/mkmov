@@ -302,7 +302,9 @@ class MovMakerTwodBM(object):
         if self.arguments['--min'] and self.arguments['--max']:
             pmeshopts['vmin']=float(self.arguments['--min'])
             pmeshopts['vmax']=float(self.arguments['--max'])
-                    
+
+        if self.arguments['--cmap']:
+            pmeshopts['cmap']=self.arguments['--cmap']
             
 
         fig=plt.figure()
