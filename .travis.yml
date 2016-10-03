@@ -100,3 +100,6 @@ script:
   #test quiver options
   - python mkmov.py quiver --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos  $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_U_2D_small.nc $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_V_2D_small.nc 
   - python mkmov.py quiver --cmap seismic --vorticity --tfile examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc --tfilevar zos  --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_U_2D_small.nc $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_V_2D_small.nc 
+
+  #test basemap options
+  - python mkmov.py 2dbm  --rotatex 5 --xorigin 40 --yorigin -10 --proj moll lon lat adt $(pwd)/mkmovexamples/aviso_madt/*.nc 

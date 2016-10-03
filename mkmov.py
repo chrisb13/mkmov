@@ -26,6 +26,7 @@ This is a python package for making movies. It has four things it can do:
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
     [T4] stitch a list of png files into a movie ("see python mkmov.py stitch -h").
     [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
+    [T6] movie of a netCDF file plotting contourf output using basemap
 
 Usage: 
     mkmov.py -h --help
@@ -37,6 +38,7 @@ Commands:
    3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
    stitch      [T4] stitch files together using ffmpeg
    quiver      [T5] use two netCDF files to make a quiver of a 2d field
+   2dbm        [T6] use a netCDF file make a contourf of a 2d field and use basemap
    examples    show some examples of commands that work 'out of the box'
 
 See 'python mkmov.py help <command>' for more information on a specific command.
@@ -193,6 +195,35 @@ References:
     [1] http://matplotlib.org/examples/color/colormaps_reference.html
 """
 
+TWODBM=\
+"""
+MkMov: sub-command "2dbm" help.
+    [T6] movie of a netCDF file plotting contourf output using basemap
+
+Usage: 
+    mkmov.py 2dbm [--preview --proj PROJECTION --rotatex XSPEED --xorigin XSTART --yorigin YSTART -o OUTPATH] X_NAME Y_NAME VARIABLE_NAME FILE_NAME...
+
+Arguments:
+    X_NAME          variable for longitudes
+    Y_NAME          variable for latitudes
+    VARIABLE_NAME   variable name
+    FILE_NAME       path to NetCDF file to make movie, can also be a list of files (dimensions must be the same)
+
+Options:
+    -h,--help                   : show this help message
+    --preview                   : show a preview of the plot (will exit afterwards).
+    --proj PROJECTION           : projection, options are [2], default is 'moll'
+    --rotatex XSPEED            : spin/rotate the x coordinate (each frame will increment the specified number of degrees)
+    --xorigin XSTART            : xcenter of map will be located at xorigin (default is 130 E)
+    --yorigin YSTART            : ycenter of map will be located at yorigin (default is 0    )
+    -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
+
+References:
+    [1] http://matplotlib.org/basemap/
+    [2] http://matplotlib.org/basemap/users/mapsetup.html
+"""
+
+
 
 EXAMPLES=\
 """
@@ -312,6 +343,25 @@ if __name__ == "__main__":
             matplotlib.use('Agg')
 
         movmk=sc.MovMakerQuiver(arguments['FILE_NAME'],arguments['VAR_X'],arguments['VAR_Y'],workingfol,arguments)
+
+        # #aah I've always wanted to say this!
+        movmk.lights()
+        movmk.camera(plotpreview=arguments['--preview'])
+        movmk.action()
+        # movmk.cleanup()
+
+    elif arguments_top['<command>'] == '2dbm':
+        arguments=docopt(TWODBM)
+        workingfol=sc.workingfol_func(arguments)
+
+        sc.dispay_passed_args_twodbm(arguments,workingfol)
+
+        if not arguments['--preview']:
+            #for travis-ci
+            import matplotlib
+            matplotlib.use('Agg')
+
+        movmk=sc.MovMakerTwodBM(arguments['FILE_NAME'],arguments['VARIABLE_NAME'],workingfol,arguments)
 
         # #aah I've always wanted to say this!
         movmk.lights()
