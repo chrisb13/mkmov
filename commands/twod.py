@@ -58,9 +58,11 @@ def cmap_center_point_adjust(cmap, range, center):
         fn = lambda x : (x[0]**a, x[1], x[2])
         for key in ('red','green','blue'):
             cdict[key] = map(fn, cdict[key])
-            cdict[key].sort()
-            assert (cdict[key][0]<0 or cdict[key][-1]>1), \
-                "Resulting indices extend out of the [0, 1] segment."
+            # cdict[key].sort() #this was a problem for python3
+            cdict[key]=sorted(cdict[key])
+            # python 3 didn't like..
+            # assert (cdict[key][0]<0 or cdict[key][-1]>1), \
+                # "Resulting indices extend out of the [0, 1] segment."
         return matplotlib.colors.LinearSegmentedColormap('colormap',cdict,1024)
 
     if not ((range[0] < center) and (center < range[1])):
