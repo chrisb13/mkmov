@@ -133,6 +133,9 @@ def dispay_passed_args_quiver(arguments,workingfolder):
             _lg.error("This option can only be used when you have specified a --x2d and --y2d")
             sys.exit("This option can only be used when you have specified a --x2d and --y2d")
 
+    if np.mod(len(arguments['FILE_NAME']),2)!=0:
+        _lg.error("please pass an even number of files (half U and half V).")
+        sys.exit("please pass an even number of files (half U and half V).")
 
     _lg.info("-----------------------------------------------------------------")
     return
@@ -140,7 +143,10 @@ def dispay_passed_args_quiver(arguments,workingfolder):
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
-    for i in range(0, len(l), n):
+    # print(l,n)
+    for i in np.arange(0, len(l), n):
+        i=int(i)
+        n=int(n)
         yield l[i:i + n]
 
 class MovMakerQuiver(object):
@@ -201,8 +207,8 @@ class MovMakerQuiver(object):
         #error checks files, are all similar
 
         fchunked=chunks(self.filelist,len(self.filelist)/2)
-        self.xfiles=fchunked.next()
-        self.yfiles=fchunked.next()
+        self.xfiles=next(fchunked)
+        self.yfiles=next(fchunked)
 
         for xf,yf in zip(self.xfiles,self.yfiles):
             if not os.path.exists(xf):

@@ -60,13 +60,6 @@ install:
 #  - python setup.py install
 
 
-
-#need to add these files to  git-lfs
-#- python mkmov.py quiver --preview --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_U_2D.nc /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_V_2D.nc
-
-#for the vorticity features...
-#python mkmov.py quiver --preview --cmap seismic --vorticity --tfile examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc --tfilevar zos  --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_U_2D.nc /srv/ccrc/data42/z3457920/20151012_eac_sep_dynamics/nemo_cordex24_ERAI01/2004/*_grid_V_2D.nc
-
 #offlinetestingstring
 script:
   - python mkmov.py 2d --bias  time_counter --bcmapcentre --cmap seismic --min -.4 --max .7  --lmask 0 zos examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc
@@ -103,3 +96,7 @@ script:
   - python mkmov.py 2d adt --lmask -214748 --x lon --y lat --cmap Accent -o $(pwd)/AVISOdt_global_allsat_madt_Accent.mov $(pwd)/mkmovexamples/aviso_madt/*.nc 
   - python mkmov.py 2d PV --fps 10 --fighgt 2.5 --figwth 14  -o  $(pwd)/avemom6PV_toplayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
   - python mkmov.py 2d PV --fps 10 --4dvar 1 -o  $(pwd)/avemom6PV_bottomlayer.mov $(pwd)/mkmovexamples/mom6/ave_prog__0006_016.nc
+
+  #test quiver options
+  - python mkmov.py quiver --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos  $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_U_2D_small.nc $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_V_2D_small.nc 
+  - python mkmov.py quiver --cmap seismic --vorticity --tfile examples/cordex24-ERAI01_1d_20040101_20040111_grid_T_2D.nc --tfilevar zos  --lmask 0 --fixdateline --x2d nav_lon --y2d nav_lat  uos vos $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_U_2D_small.nc $(pwd)/mkmovexamples/nemo/cordex24-ERAI01_1d_20040101_20041231_grid_V_2D_small.nc 
