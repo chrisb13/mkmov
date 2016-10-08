@@ -168,7 +168,7 @@ MkMov: sub-command "quiver" help.
     [T5] movie of two netCDF files plotting quiver of U/V fields from a C-grid
 
 Usage: 
-    mkmov.py quiver [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --vorticity --tfile TFILE --tfilevar TFILEVAR --cmap PLTCMAP --lmask LANDVAR --4dvar DEPTHLVL --x2d XVARTWOD --y2d YVARTWOD --fixdateline] VAR_X VAR_Y FILE_NAME...
+    mkmov.py quiver [--min MINIMUM --max MAXIMUM -o OUTPATH --preview --vorticity --magonly --tfile TFILE --tfilevar TFILEVAR --cmap PLTCMAP --lmask LANDVAR --4dvar DEPTHLVL --x2d XVARTWOD --y2d YVARTWOD --fixdateline] VAR_X VAR_Y FILE_NAME...
 
 Arguments:
     VAR_X           variable name in the x direction
@@ -180,6 +180,7 @@ Options:
     -o OUTPATH                  : path/to/folder/to/put/movie/in/moviename.mov  (needs to be absolute path, no relative paths)
     --preview                   : show a preview of the plot (will exit afterwards).
     --vorticity                 : plot vorticity
+    --magonly                   : plot magnitude of vector only
     --tfile TFILE               : plot land mask from T-file            (must specify tfilevar), assumes a 3d file from NEMO T-grid.
     --tfilevar TFILEVAR         : variable from T-file to plot landmask (must specify tfile)
     --cmap PLTCMAP              : matplotlib color map to contourf with. See [1] for options.

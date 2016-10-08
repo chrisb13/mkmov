@@ -99,6 +99,20 @@ def dispay_passed_args_quiver(arguments,workingfolder):
 
         _lg.info("The landmask will be plotted from variable: " + arguments['--tfilevar'])
 
+
+    if arguments['--vorticity']:
+        _lg.info("You have said you only want to plot vorticity" )
+        if arguments['--magonly']:
+            _lg.error("Not compatible with vorticity option")
+            sys.exit("Not compatible with vorticity option")
+
+    if arguments['--magonly']:
+        _lg.info("You have said you only want to plot magnitude of vectors (no quivers)" )
+        if arguments['--vorticity']:
+            _lg.error("Not compatible with magonly option")
+            sys.exit("Not compatible with magonly option")
+
+
     if arguments['--cmap']:
         _lg.info("You have said you would like to contourf with the following matplotlib colour map: " + \
                 arguments['--cmap'])
@@ -413,7 +427,8 @@ class MovMakerQuiver(object):
                     # arrayy=arrayy/mag
                     # plt.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale=1)
 
-                    ax.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale_units='xy')
+                    if not self.arguments['--magonly']:
+                        ax.quiver(x[skip], y[skip], arrayx[skip], arrayy[skip], pivot='mid',color='black', units='xy',headwidth=1,  headlength=4,angles='xy',scale_units='xy')
 
                     ax.set_title("Plotting: "+self.variable_x+' and  '+self.variable_y+'. Frame num is: ' +str(self.framecnt))
 
