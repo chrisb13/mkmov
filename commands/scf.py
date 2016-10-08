@@ -62,6 +62,34 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
     :fps_pass (optional): 
     :returns: None (except for a movie!)
     """
+    def fixcomment(ffmpegcomm):
+        """function that fixes the ffmpeg commaand so that it can be properly passed to subprocess
+        
+        Note:
+        Based on:
+        http://stackoverflow.com/questions/29801975/why-is-the-subprocess-popen-argument-length-limit-smaller-than-what-the-os-repor
+        Poor form to use shell=True basically.
+        
+        :returns: list
+        """
+        newcomm=[]
+        lw=''
+        insidecomm=False
+        for w in ffmpegcomm.split():
+            if 'comment' in w:
+                lw+=w
+                insidecomm=True
+            elif insidecomm:
+                if '-vb' not in w:
+                    lw+=w
+                else:
+                    newcomm.append(lw)
+                    newcomm.append(w)
+                    insidecomm=False
+            else:
+                newcomm.append(w)
+        return newcomm
+    
     #ollie's command didn't work on storm
     # os.chdir(pngfolder)
     # subprocess.call('ffmpeg -framerate 10 -y -i moviepar%05d.png -s:v 1920x1080 -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p movie.mp4')
@@ -81,10 +109,31 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
     quality='20'
     if outputdir:
         os.chdir(pngfolder)
-        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an '+outputdir,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        # subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -vb '+quality+'M -y -an '+outputdir,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        comm='ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an '+outputdir
+        newcomm=fixcomment(comm)
+        try:
+            subprocess.call(newcomm,shell=False,stdout=FNULL, stderr=subprocess.STDOUT)
+        except OSError, e:
+            if len(newcomm[6])>10000:
+                _lg.warning("Metadata likely too long, will not record")
+                subprocess.call(newcomm[:5]+newcomm[7:],shell=False,stdout=FNULL, stderr=subprocess.STDOUT)
+            else:
+                _lg.error("Error: " + e)
+                sys.exit()
     else:                                                       
         os.chdir(pngfolder)                                     
-        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+
+        newcomm=fixcomment('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an movie.mov')
+        try:
+            subprocess.call(,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        except OSError, e:
+            if len(newcomm[6])>10000:
+                _lg.warning("Metadata likely too long, will not record")
+                subprocess.call(newcomm[:5]+newcomm[7:],shell=False,stdout=FNULL, stderr=subprocess.STDOUT)
+            else:
+                _lg.error("Error: " + e)
+                sys.exit()
 
     #remove png
     if os.path.isfile(pngfolder+'movie.mov') or os.path.isfile(outputdir):
