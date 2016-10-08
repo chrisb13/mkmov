@@ -81,10 +81,10 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
     quality='20'
     if outputdir:
         os.chdir(pngfolder)
-        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png -vb '+quality+'M -y -an '+outputdir,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-    else:
-        os.chdir(pngfolder)
-        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png -vb '+quality+'M -y -an movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an '+outputdir,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+    else:                                                       
+        os.chdir(pngfolder)                                     
+        subprocess.call('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an movie.mov',shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
 
     #remove png
     if os.path.isfile(pngfolder+'movie.mov') or os.path.isfile(outputdir):
