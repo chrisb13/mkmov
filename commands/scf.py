@@ -126,7 +126,7 @@ def call_ffmpeg(pngfolder,fps_pass=None,outputdir=None):
 
         newcomm=fixcomment('ffmpeg -r '+fps+' -i moviepar%05d.png '+' -metadata comment="'+' '.join(sys.argv)+'"'+' -vb '+quality+'M -y -an movie.mov')
         try:
-            subprocess.call(,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
+            subprocess.call(newcomm,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
         except OSError, e:
             if len(newcomm[6])>10000:
                 _lg.warning("Metadata likely too long, will not record")
