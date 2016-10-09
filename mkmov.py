@@ -33,14 +33,13 @@ Usage:
     mkmov.py <command> [-h --help] [<args>...]
 
 Commands:
-   2d              [T1] use a netCDF file make a contourf of a 2d field
-   3dcube          [T2] use a netCDF file make a movie of a 3d field as a 3d cube
-   3dsurf          [T3] use a netCDF file make a movie of a 2d field as a 3d surface
-   stitch          [T4] stitch files together using ffmpeg
-   quiver          [T5] use two netCDF files to make a quiver of a 2d field
-   2dbm            [T6] use a netCDF file make a contourf of a 2d field and use basemap
-   examples        show some examples of commands that work 'out of the box'
-   pmeta           displays command that produced MkMov file     
+   2d          [T1] use a netCDF file make a contourf of a 2d field
+   3dcube      [T2] use a netCDF file make a movie of a 3d field as a 3d cube
+   3dsurf      [T3] use a netCDF file make a movie of a 2d field as a 3d surface
+   stitch      [T4] stitch files together using ffmpeg
+   quiver      [T5] use two netCDF files to make a quiver of a 2d field
+   2dbm        [T6] use a netCDF file make a contourf of a 2d field and use basemap
+   examples    show some examples of commands that work 'out of the box'
 
 See 'python mkmov.py help <command>' for more information on a specific command.
 
@@ -258,16 +257,6 @@ python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 $(pwd)/examples/StitchMe
 python mkmov.py stitch -o $(pwd)/stitchmov.mov --fps 10 --killsplash $(pwd)/examples/StitchMePlots/*.png
 """
 
-PMETA=\
-"""
-MkMov: sub-command "show_metadata". 
-
-Usage: 
-    mkmov.py pmeta  FILE_NAME...
-
-Arguments:
-    FILE_NAME       path to mov file(s) to print the MkMov command that made the file
-"""
 
 from docopt import docopt
 import commands as sc
@@ -393,16 +382,6 @@ if __name__ == "__main__":
 
     elif arguments_top['<command>'] == 'examples':
         print(EXAMPLES)
-
-    elif arguments_top['<command>'] == 'pmeta':
-        import os
-        FNULL = open(os.devnull, 'w')
-        for fnum,f in enumerate(arguments_top['<args>']):
-            fout=str(fnum).zfill(5)+'_temp.txt'
-            subprocess.call('ffmpeg -i '+f+' -f ffmetadata '+fout,shell=True,stdout=FNULL, stderr=subprocess.STDOUT)
-            mkmovcomm=[ line for line in open(fout) if 'comment' in line]
-            print("File: "+ os.path.basename(f) + ". Created with: " + mkmovcomm[0][8:-1])
-            os.remove(fout)
 
     #display help messages
     elif arguments_top['<command>'] == 'help' and len(arguments_top['<args>'])==0:
