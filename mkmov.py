@@ -20,7 +20,7 @@
 
 """
 MkMov v0.4
-This is a python package for making movies. It has four things it can do:
+This is a python package for making movies. It has six things it can do:
     [T1] movie of a netCDF file plotting contourf output (see "python mkmov.py 2d -h");
     [T2] movie of a netCDF file plotting slices of a 3d variable as a 3d cube (see "python mkmov.py 3dcube -h");
     [T3] movie of a netCDF file plotting a 2d variable as a 3d surface (see "python mkmov.py 3dsurf -h");
