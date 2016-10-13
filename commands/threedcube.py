@@ -445,7 +445,7 @@ class MovMakerThreeDCube(object):
         """
         _lg.info("Action! Stitching your plots together with ffmpeg...")
 
-        scf.call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
+        call_ffmpeg(self.workingfolder,outputdir=self.arguments['-o'])
 
     def cleanup(self):
         """function to clean up the mess we have made
