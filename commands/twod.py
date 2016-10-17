@@ -381,7 +381,10 @@ def goplot(MovMakerClass,ax,name_of_array,zoominset=False,hamming=False):
                     MovMakerClass.cidx=0
                 MovMakerClass.firstdate=np.datetime64(MovMakerClass.arguments['--tstart'])+MovMakerClass.cidx*diff
 
-            cdate=str(MovMakerClass.firstdate+MovMakerClass.framecnt*diff)
+            if MovMakerClass.framecnt==1:
+                cdate=str(MovMakerClass.firstdate)
+            else:
+                cdate=str(MovMakerClass.firstdate+MovMakerClass.framecnt*diff)
 
             ax.set_title(MovMakerClass.variable_name+' frame num is: ' +str(MovMakerClass.framecnt)+ '. Time: ' +cdate)
         else:
@@ -496,7 +499,7 @@ class MovMaker(object):
         self.workingfolder=workingfolder
         self.arguments=argu
 
-    def getdata(self,ifile,preview=False):
+    def getdata(self,ifile,preview=False,notime=False):
         """function that grabs the data
         :returns: nparray
         """
@@ -505,13 +508,18 @@ class MovMaker(object):
                 var_nparray=ifile.variables[self.variable_name][:,self.depthlvl,:,:]
             else:
                 var_nparray=ifile.variables[self.variable_name][:]
+
+            if notime:
+                var_nparray=np.expand_dims(var_nparray,axis=0)
         else:
             if self.var_len==4:
                 var_nparray=ifile.variables[self.variable_name][0,self.depthlvl,:,:]
+            elif self.var_len==2:
+                var_nparray=ifile.variables[self.variable_name][:]
             else:
                 var_nparray=ifile.variables[self.variable_name][0,:]
             var_nparray=np.expand_dims(var_nparray,axis=0)
-    
+
         return var_nparray
 
     def lights(self,minvar=None,maxvar=None):
@@ -561,10 +569,11 @@ class MovMaker(object):
             #what shape is the passed variable? Do some error checks
             self.var_len=len(ifile.variables[self.variable_name].shape)
             if self.var_len==2:
-                if len(self.arguments['FILE_NAMES'])==1:
+                if len(self.arguments['FILE_NAME'])==1:
                     #h'm haven't actually tried this! 
                     _lg.error("Variable: " + str(self.variable_name) + " has only two dimensions and you only fed mkmov one file so I don't know where your time dimension is.")
-                elif len(self.arguments['FILE_NAMES'])>1: #have tested this on AVISO works okay
+                    sys.exit()
+                elif len(self.arguments['FILE_NAME'])>1: #have tested this on AVISO works okay
                     pass
                     
             #the 'obvious' case; one file with one time dim and two spatial dims
@@ -609,9 +618,15 @@ class MovMaker(object):
                 timename=''
 
             if timename!='':
-                _lg.info("Good news, we think we found the time dimension it's called: " + timename )
-                var_timedim=[i for i, x in enumerate(ifile.variables[self.variable_name].dimensions) if x==timename][0]
-                var_timedims.append(var_timedim)
+                if self.var_len>2:
+                    _lg.info("Good news, we think we found the time dimension it's called: " + timename )
+                    var_timedim=[i for i, x in enumerate(ifile.variables[self.variable_name].dimensions) if x==timename][0]
+                    var_timedims.append(var_timedim)
+
+
+            # the case where there is only two dimensions assumed to vary across each file (e.g. mwf-ers2 files)
+            if self.var_len==2:
+                var_timedims=[-1]
 
             ifile.close()
 
@@ -670,8 +685,13 @@ class MovMaker(object):
             if self.var_len==4:
                 name_of_array=[name_of_array[0]]+[e for e in name_of_array[2:]]
 
-            self.x,self.y=np.meshgrid(np.arange(name_of_array[self.timedim+2]),\
-                    np.arange(name_of_array[self.timedim+1]))
+            if self.timedim==-1:
+                self.x,self.y=np.meshgrid(np.arange(name_of_array[1]),\
+                        np.arange(name_of_array[0]))
+            else:
+                self.x,self.y=np.meshgrid(np.arange(name_of_array[self.timedim+2]),\
+                        np.arange(name_of_array[self.timedim+1]))
+
             ifile.close()
 
         return
@@ -698,12 +718,18 @@ class MovMaker(object):
         else:
             fig=plt.figure()
 
+        notimedim=False
+        if self.timedim==-1:
+            notimedim=True
+            self.timedim=0
+
         for f in self.filelist:
             ifile=Dataset(f, 'r')
+
             if not plotpreview:
-                name_of_array=self.getdata(ifile)
+                name_of_array=self.getdata(ifile,notime=notimedim)
             else:
-                name_of_array=self.getdata(ifile,preview=True)
+                name_of_array=self.getdata(ifile,preview=True,notime=notimedim)
 
             #h'm the following loop has a problem, because if tstep isn't in dim 0 we are screwed! (probably needs some fancy syntax to slice out of name_of_array (hard without google)
             if self.timedim!=0:
