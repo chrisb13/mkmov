@@ -610,6 +610,8 @@ class MovMaker(object):
             #okay so we didn't find time as an unlimited dimension, perhaps it has a sensible name?
             if 'time' in ifile_dim_keys:
                 timename='time'
+            elif 'TIME' in ifile_dim_keys:
+                timename='TIME'
             elif 't' in ifile_dim_keys:
                 timename='t'
             elif 'Time' in ifile_dim_keys:
